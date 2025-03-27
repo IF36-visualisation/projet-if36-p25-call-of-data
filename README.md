@@ -30,7 +30,7 @@ Ce projet repose sur l’exploitation de quatre jeux de données issus de la pla
     -   🔗 Source : [Summer Transfer Window](https://www.kaggle.com/datasets/ruslanhuretski/202223-football-summer-transfer-window)
     -   📊 2000 observations × 11 variables
     -   🧾 Contenu : nom du joueur, poste, âge, valeur de marché, pays de provenance/destination, clubs concernés et type de transfert.
-    -   📂 Principalement des variables catégorielles et numériques simples.
+    -   📂 Principalement des variables catégorielles et numériques.
 
 Ces données permettent d’analyser à la fois les performances sportives (individuelles et collectives) et les mouvements stratégiques des clubs (transferts), dans un contexte européen de haut niveau.
 
