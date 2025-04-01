@@ -6,6 +6,8 @@ Membres: Ahamad MOHAMMAD; Minko Bikono NEIL-JOVY; Simon GELBART; Willen AMICHE
 
 ## Introduction
 
+" Notre objectif est d’explorer l’impact des stratégies de recrutement sur les performances sportives des clubs et joueurs. En combinant des statistiques individuelles, collectives et des données de transferts, nous chercherons à identifier les tendances qui influencent la réussite des équipes sur plusieurs saisons. "
+
 ### Données
 
 Ce projet repose sur l’exploitation de quatre jeux de données issus de la plateforme Kaggle, tous centrés autour du football professionnel européen sur les saisons 2021-2022 et 2022-2023 :
@@ -50,7 +52,7 @@ L’objectif de l’analyse est d’explorer les relations entre les performance
 
 -   **Analyse des profils de joueurs** : Existe-t-il des profils de joueurs (poste, âge, statistique-clé) qui ressortent parmi les recrues les plus fréquentes ou les plus chères ?
 
--   **Facteurs influents** : Quelles sont les variables les plus déterminantes dans les bonnes performances individuelles (gardiens, attaquants, milieux, etc.) ou collectives ?
+-   **Facteurs influents** : Quelles sont les variables les plus déterminantes dans les bonnes performances individuelles (gardiens, défenseurs, milieux, attaquants) ou collectives ?
 
 -   **Visualisations exploratoires** : Scatterplots, comparatifs par club/poste/saison permettront de faire émerger des tendances.
 
