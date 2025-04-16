@@ -38,6 +38,12 @@ Ce projet repose sur l’exploitation de quatre jeux de données issus de la pla
 
 Ces données permettent d’analyser à la fois les performances sportives (individuelles et collectives) et les mouvements stratégiques des clubs (transferts), dans un contexte européen de haut niveau.
 
+
+
+### Tableau recapitulatif des questions et idée de graphiques/visu
+
+
+
 ------------------------------------------------------------------------
 
 ### Plan d’analyse
