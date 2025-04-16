@@ -42,7 +42,7 @@ Ces données permettent d’analyser à la fois les performances sportives (indi
 
 
 
-### Tableau recapitulatif des questions et idée de graphiques/visu
+### Tableau recapitulatif des questions et idée de graphiques/visualisation
 
 | Question d’analyse                                                                                   | Variables principales                                      | Type de visualisation suggéré         | Objectif                                                                                 |
 |--------------------------------------------------------------------------------------------------------|-------------------------------------------------------------|----------------------------------------|------------------------------------------------------------------------------------------|
