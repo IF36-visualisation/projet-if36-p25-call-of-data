@@ -1,0 +1,214 @@
+---
+title: "Livrable1"
+output: html_document
+author: "Ahamad MOHAMMAD; Minko Bikono NEIL-JOVY; Simon GELBART; Willen AMICHE"
+---
+
+
+# 📊 Description des variables
+
+## 🧍‍♂️ Player Stats 2021-2022 (`2021-2022 Football Player Stats.csv`)
+
+143 variables – chaque ligne correspond à un joueur pour la saison 2021-2022.
+
+| Variable          | Type      | Description approximative |
+|-------------------|-----------|----------------------------|
+| `Rk`              | int64     | Rang ou ID du joueur       |
+| `Player`          | object    | Nom du joueur              |
+| `Nation`          | object    | Nationalité                |
+| `Pos`             | object    | Poste                      |
+| `Squad`           | object    | Club                       |
+| `Comp`            | object    | Compétition principale     |
+| `Age`             | object    | Âge                        |
+| `Born`            | object    | Année de naissance         |
+| ...               | ...       | ...et plus de 130 autres statistiques de jeu : buts, passes, tirs, dribbles, fautes, tacles, interceptions, passes progressives, etc. |
+| `AerWon`          | float64   | Duels aériens gagnés       |
+| `AerLost`         | float64   | Duels aériens perdus       |
+| `AerWon%`         | float64   | Pourcentage de duels aériens gagnés |
+
+---
+
+## 🏟️ Team Stats 2021-2022 (`2021-2022 Football Team Stats.csv`)
+
+20 variables – chaque ligne correspond à une équipe.
+
+| Variable          | Type      | Description |
+|------------------|-----------|-------------|
+| `Rk`             | int64     | Rang        |
+| `Squad`          | object    | Nom du club |
+| `Country`        | object    | Pays        |
+| `LgRk`           | int64     | Classement dans la ligue |
+| `MP`, `W`, `D`, `L` | int64  | Matchs joués, Victoires, Nuls, Défaites |
+| `GF`, `GA`, `GD` | int64     | Buts pour, contre, différence |
+| `Pts`, `Pts/G`   | int64 / float64 | Points et moyenne par match |
+| `xG`, `xGA`, `xGD`, `xGD/90` | float64 | Données d’expected goals |
+| `Attendance`     | int64     | Affluence moyenne |
+| `Top Team Scorer`| object    | Meilleur buteur |
+| `Goalkeeper`     | object    | Gardien principal |
+
+---
+
+## 🏟️ Team Stats 2022-2023 (`2022-2023 Football Team Stats.csv`)
+
+Même structure et signification que pour 2021-2022, mais avec la saison suivante.
+
+---
+
+## 🔄 Transfers Été 2022 (`2022_2023_football_summer_transfers.csv`)
+
+11 variables – chaque ligne correspond à un transfert.
+
+| Variable        | Type    | Description |
+|----------------|---------|-------------|
+| `name`         | object  | Nom du joueur transféré |
+| `position`     | object  | Poste            |
+| `age`          | object  | Âge              |
+| `market_value` | object  | Valeur estimée   |
+| `country_from` | object  | Pays de départ   |
+| `league_from`  | object  | Ligue de départ  |
+| `club_from`    | object  | Club de départ   |
+| `country_to`   | object  | Pays d’arrivée   |
+| `league_to`    | object  | Ligue d’arrivée  |
+| `club_to`      | object  | Club d’arrivée   |
+| `fee`          | object  | Montant du transfert (peut contenir "Free", "Loan", etc.) |
+
+---
+
+```{r}
+# Chargement des packages nécessaires
+
+library(tidyverse)
+library(ggplot2)
+```
+
+
+```{r importation-donnees, message=FALSE, warning=FALSE}
+# Importation des données
+
+player_stats_2021_2022 <- read.csv("data/2021-2022 Football Player Stats.csv", sep = ";", fileEncoding = "ISO-8859-1")
+team_stats_2021_2022 <- read.csv("data/2021-2022 Football Team Stats.csv", sep = ";", fileEncoding = "ISO-8859-1")
+team_stats_2022_2023 <- read.csv("data/2022-2023 Football Team Stats.csv", sep = ";", fileEncoding = "ISO-8859-1")
+transfers_2022 <- read.csv("data/2022_2023_football_summer_transfers.csv", sep = ",", fileEncoding = "ISO-8859-1")
+
+```
+
+
+## Question 1: Quels clubs ont le plus recruté par poste (top 20) ?
+
+### 🎯 Objectif
+Identifier les **20 clubs les plus actifs** lors du mercato d’été 2022 en termes de nombre de recrues, puis visualiser quels postes ont été ciblés en priorité par ces clubs. Cela permet de mieux comprendre les **stratégies de renforcement** des effectifs selon les lignes de jeu (défense, milieu, attaque).
+
+
+```{r}
+# Nettoyage de base
+transfers_clean <- transfers_2022 %>%
+  filter(!is.na(club_to), !is.na(position), position != "")
+
+# Regrouper et compter
+recrutements_par_poste <- transfers_clean %>%
+  group_by(club_to, position) %>%
+  summarise(nb_recrues = n(), .groups = "drop")
+
+# Garder uniquement les 20 clubs ayant recruté le plus globalement
+top_clubs <- recrutements_par_poste %>%
+  group_by(club_to) %>%
+  summarise(total_recrues = sum(nb_recrues)) %>%
+  top_n(20, total_recrues) %>%
+  pull(club_to)
+
+# Filtrer les données
+recrutements_top <- recrutements_par_poste %>%
+  filter(club_to %in% top_clubs)
+
+# Visualisation 
+ggplot(recrutements_top, aes(x = position, y = fct_reorder(club_to, nb_recrues), fill = nb_recrues)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  labs(
+    title = "Top 20 clubs – nombre de recrues par poste (été 2022)",
+    x = "Poste",
+    y = "Club",
+    fill = "Nombre de recrues"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### 🧠 Interprétation du graphique
+
+- 🔵 **US Salernitana 1919** est le club qui a le plus recruté tous postes confondus, avec un **focus important sur les milieux offensifs** et **défenseurs centraux**.
+
+- 🔵 **US Lecce**, **US Cremonese** et **Udinese Calcio** (clubs italiens) montrent aussi une stratégie de **renforcement défensif**, particulièrement en **centre-back**.
+
+- 🔵 **Olympique de Marseille** et **Nottingham Forest** ont **diversifié leurs recrutements** sur plusieurs lignes, y compris **les ailes** (*left/right winger*).
+
+- 🎯 On observe une **forte demande en milieux de terrain**, notamment :
+  - *Attacking Midfield*
+  - *Defensive Midfield*
+  - *Centre Midfield*
+
+-  Peu de clubs ont recruté plusieurs **gardiens**, ce qui est logique : un club n’en fait souvent venir qu’un seul par saison.
+
+-  Certains clubs comme **FC Empoli** ou **OGC Nice** présentent une stratégie de recrutement **équilibrée sur différentes lignes**, ce qui pourrait indiquer un **renouvellement global de l’effectif**.
+
+
+
+## Question 2: 
+
+
+### 🎯 Objectif
+
+
+
+```{r}
+
+```
+
+
+
+### 🧠 Interprétation du graphique
+
+
+
+## Question 3: 
+
+
+### 🎯 Objectif
+
+
+```{r}
+
+```
+
+
+### 🧠 Interprétation du graphique
+
+
+
+## Question 3: 
+
+
+### 🎯 Objectif
+
+
+```{r}
+
+```
+
+
+### 🧠 Interprétation du graphique
+
+
+
+## Question 4: 
+
+
+### 🎯 Objectif
+
+
+```{r}
+
+```
+
+
+### 🧠 Interprétation du graphique
