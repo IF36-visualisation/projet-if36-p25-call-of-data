@@ -153,29 +153,13 @@ ggplot(recrutements_top, aes(x = position, y = fct_reorder(club_to, nb_recrues),
 
 
 
+
 ## Question 2: 
 
 
 ### 🎯 Objectif
 
 
-
-```{r}
-
-```
-
-
-
-### 🧠 Interprétation du graphique
-
-
-
-## Question 3: 
-
-
-### 🎯 Objectif
-
-
 ```{r}
 
 ```
@@ -197,6 +181,7 @@ ggplot(recrutements_top, aes(x = position, y = fct_reorder(club_to, nb_recrues),
 
 
 ### 🧠 Interprétation du graphique
+
 
 
 
