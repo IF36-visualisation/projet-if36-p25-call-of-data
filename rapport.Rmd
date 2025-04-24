@@ -8,14 +8,14 @@ output:
 ---
 
 
-## Introduction
+## **Introduction**
 
 Notre objectif est d’explorer l’impact des stratégies de recrutement sur les performances sportives des clubs et joueurs. En combinant des statistiques individuelles, collectives et des données de transferts, nous chercherons à identifier les tendances qui influencent la réussite des équipes sur plusieurs saisons. 
 
 
-### 📊 Description des variables
+### **📊 Description des variables**
 
-#### 🧍‍♂️ Player Stats 2021-2022 (`2021-2022 Football Player Stats.csv`)
+#### - 🧍‍♂️ Player Stats 2021-2022 (`2021-2022 Football Player Stats.csv`)
 
 143 variables – chaque ligne correspond à un joueur pour la saison 2021-2022.
 
@@ -36,7 +36,7 @@ Notre objectif est d’explorer l’impact des stratégies de recrutement sur le
 
 ---
 
-#### 🏟️ Team Stats 2021-2022 (`2021-2022 Football Team Stats.csv`)
+#### - 🏟️ Team Stats 2021-2022 (`2021-2022 Football Team Stats.csv`)
 
 20 variables – chaque ligne correspond à une équipe.
 
@@ -56,13 +56,13 @@ Notre objectif est d’explorer l’impact des stratégies de recrutement sur le
 
 ---
 
-#### 🏟️ Team Stats 2022-2023 (`2022-2023 Football Team Stats.csv`)
+#### - 🏟️ Team Stats 2022-2023 (`2022-2023 Football Team Stats.csv`)
 
 Même structure et signification que pour 2021-2022, mais avec la saison suivante.
 
 ---
 
-#### 🔄 Transfers Été 2022 (`2022_2023_football_summer_transfers.csv`)
+#### - 🔄 Transfers Été 2022 (`2022_2023_football_summer_transfers.csv`)
 
 11 variables – chaque ligne correspond à un transfert.
 
@@ -82,7 +82,10 @@ Même structure et signification que pour 2021-2022, mais avec la saison suivant
 
 ---
 
-```{r}
+## **Analyse et réponses aux questions**
+
+
+```{r chargement-librairies, message=FALSE}
 # Chargement des packages nécessaires
 
 library(tidyverse)
@@ -97,17 +100,20 @@ player_stats_2021_2022 <- read.csv("data/2021-2022 Football Player Stats.csv", s
 team_stats_2021_2022 <- read.csv("data/2021-2022 Football Team Stats.csv", sep = ";", fileEncoding = "ISO-8859-1")
 team_stats_2022_2023 <- read.csv("data/2022-2023 Football Team Stats.csv", sep = ";", fileEncoding = "ISO-8859-1")
 transfers_2022 <- read.csv("data/2022_2023_football_summer_transfers.csv", sep = ",", fileEncoding = "ISO-8859-1")
-
 ```
 
+---
 
-### Question 1: Quels clubs ont le plus recruté par poste (top 20) ?
+### **Question 1:** Quels clubs ont le plus recruté par poste (top 20) ?
 
-#### 🎯 Objectif
+#### 🎯 Objectif:
 Identifier les **20 clubs les plus actifs** lors du mercato d’été 2022 en termes de nombre de recrues, puis visualiser quels postes ont été ciblés en priorité par ces clubs. Cela permet de mieux comprendre les **stratégies de renforcement** des effectifs selon les lignes de jeu (défense, milieu, attaque).
 
 
+
 ```{r}
+# Code
+
 # Nettoyage de base
 transfers_clean <- transfers_2022 %>%
   filter(!is.na(club_to), !is.na(position), position != "")
@@ -142,7 +148,7 @@ ggplot(recrutements_top, aes(x = position, y = fct_reorder(club_to, nb_recrues),
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-#### 🧠 Interprétation du graphique
+#### 🧠 Interprétation du graphique:
 
 - 🔵 **US Salernitana 1919** est le club qui a le plus recruté tous postes confondus, avec un **focus important sur les milieux offensifs** et **défenseurs centraux**.
 
@@ -160,48 +166,59 @@ ggplot(recrutements_top, aes(x = position, y = fct_reorder(club_to, nb_recrues),
 -  Certains clubs comme **FC Empoli** ou **OGC Nice** présentent une stratégie de recrutement **équilibrée sur différentes lignes**, ce qui pourrait indiquer un **renouvellement global de l’effectif**.
 
 
+---
+
+### **Question 2:** 
 
 
-### Question 2: 
+#### 🎯 Objectif:
 
 
-#### 🎯 Objectif
 
 
 ```{r}
-
+# Code
 ```
 
 
-#### 🧠 Interprétation du graphique
+#### 🧠 Interprétation du graphique:
+
+
+---
+
+### **Question 3:** 
+
+
+#### 🎯 Objectif:
 
 
 
-### Question 3: 
-
-
-#### 🎯 Objectif
 
 
 ```{r}
-
+# Code
 ```
 
 
-#### 🧠 Interprétation du graphique
+#### 🧠 Interprétation du graphique:
 
 
+---
+
+### **Question 4:** 
 
 
-### Question 4: 
+#### 🎯 Objectif:
 
-
-#### 🎯 Objectif
 
 
 ```{r}
-
+# Code
 ```
 
 
-#### 🧠 Interprétation du graphique
+#### 🧠 Interprétation du graphique:
+
+
+
+
