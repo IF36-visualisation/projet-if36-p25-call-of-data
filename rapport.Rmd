@@ -168,20 +168,91 @@ ggplot(recrutements_top, aes(x = position, y = fct_reorder(club_to, nb_recrues),
 
 ---
 
-### **Question 2:** 
+### **Question 2:** Quels postes sont les plus valorisés sur le marché ?
 
 
 #### 🎯 Objectif:
-
-
+Visualiser la valeur marchande des joueurs par poste pour comprendre quels types de profils sont les plus prisés financièrement sur le marché. Cela permet de hiérarchiser les postes selon leur importance économique dans le football professionnel. Pour ça, on se base sur le mercato qui a eu lieu durant l'été 2022.
 
 
 ```{r}
-# Code
+
+# Nettoyage des données
+transfers_clean <- transfers_2022 %>%
+  filter(!is.na(position), !is.na(market_value)) %>%
+  distinct(name, position, age, .keep_all = TRUE) %>%
+  mutate(
+    market_value_num = as.numeric(market_value)  # Convertir les valeurs en numérique
+  ) %>%
+  filter(market_value_num >= 1.5)  # Filtrer les valeurs négatives/nulles ou pas réalistes genre en dessous de 1.5 millions
+
+# On crée une colonne pour regrouper certains postes qui sont très proches
+transfers_clean <- transfers_clean %>%
+  mutate(position_fr = position) %>%
+  mutate(position_fr = recode(position_fr,
+                              "Second Striker" = "Attaquant",
+                              "Centre-Forward" = "Attaquant",
+                              "Forward Attacker" = "Attaquant",
+                              "attack" = "Attaquant",
+                              "Right Midfield" = "Ailier droit",
+                              "Left Midfield" = "Ailier gauche",
+                              "Attacking Midfield" = "Milieu offensif",
+                              "Central Midfield" = "Milieu central",
+                              "Defensive Midfield" = "Milieu central", 
+                              "Centre-Back" = "Défenseur central",
+                              "defence" = "Défenseur central",
+                              "Right Winger" = "Ailier droit",
+                              "Left Winger" = "Ailier gauche", 
+                              "Left-Back" = "Défenseur gauche",
+                              "Right-Back" = "Défenseur droit",
+                              "Goalkeeper" = "Gardien de but",
+                              .default = position_fr))  # Par défaut, on garde la position d'origine
+
+# Calcul de la moyenne et de l'écart-type des valeurs marchandes par poste
+transfers_clean_stats <- transfers_clean %>%
+  group_by(position_fr) %>%
+  filter(n() >= 5) %>%  
+  summarise(
+    mean_value = mean(market_value_num, na.rm = TRUE),
+    sd_value = sd(market_value_num, na.rm = TRUE)
+  )
+
+# Visualisation avec un barplot et des barres d'erreur pour voir les postes qui ont une grosse différence de prix
+ggplot(transfers_clean_stats, aes(x = reorder(position_fr, mean_value), y = mean_value)) +
+  geom_bar(stat = "identity", fill = "#4CAF50") +  
+  geom_errorbar(aes(ymin = pmax(mean_value - sd_value, 0), ymax = mean_value + sd_value), width = 0.2) +
+  labs(
+    title = "Valeur marchande moyenne par poste (mercato été 2022)",
+    x = "Poste",
+    y = "Valeur marchande moyenne (Millions d'€)"
+  ) +
+  theme_minimal(base_size = 12) +
+  coord_flip()
+
+
+
+transfers_clean %>%
+  count(position_fr, sort = TRUE)
+print(transfers_clean %>% count(position_fr, sort = TRUE))
+
+
+
 ```
 
 
 #### 🧠 Interprétation du graphique:
+Attaquant et Buteur : Les attaquants sont les joueurs les plus valorisés sur le marché, avec une valeur moyenne qui dépasse largement celle des autres postes. Cela reflète l'importance des joueurs offensifs dans le football moderne, où les buts et les performances offensives sont souvent décisives mais surtout les attaquants sont souvent les joueurs qui attirent le plus l'attention des fans et des médias, ce qui en fait des atouts marketing précieux pour les clubs et qui explique leur valeur bien plus élevé
+
+Défenseur central : Les défenseurs centraux occupent la deuxième place en termes de valeur marchande. Leur rôle crucial dans la stabilité défensive et leur capacité à organiser la défense expliquent cette valorisation élevée. Un bon défenseur central peut être la clé de voûte d'une équipe solide et équilibrée.
+
+Ailier droit et Ailier gauche : Les ailiers, qu’ils soient droits ou gauches, présentent une valeur marchande significative sur le marché des transferts avec respectivement la 3ème et 5ème place. Toutefois, on observe souvent une légère survalorisation des ailiers droits. Cette différence peut s’expliquer par la rareté relative des ailiers droits car cela implique souvent d'être gaucher, pour être capables de repiquer dans l’axe et de frapper avec leur pied fort. Ce profil est très recherché dans le football moderne d’où une valorisation plus élevée.
+
+Milieu central et offensif : Les milieux centraux, souvent considérés comme les "poumons" de l'équipe, sont également très valorisés. Leur polyvalence et leur capacité à influencer le jeu dans les deux sens en font des acteurs clés sur le marché. Paradoxalement, les milieux offensifs semblent être moins bien valorisés. C'est un poste qui, dans le football moderne, a perdu de sa splendeur par rapport à avant et c'est caractérisé par une baisse de la valeur marchande à ce poste.
+
+Défenseur gauche et Défenseur droit : Les défenseurs latéraux, bien que moins valorisés que les défenseurs centraux, restent importants.Ils sont très recherchés dans le football moderne car ils doivent être polyvalents, capables de défendre et d'attaquer efficacement.On ne retrouve pas la rareté des latéraux droit par rapport au gauche comme on peut avoir avec les ailiers et on remarque qu'à l'inverse les latéraux gauche on tendance à avoir une plus grosse valeur marchande. 
+
+Gardien de but : Les gardiens de but sont nettement moins valorisés que les autres postes. Cela s’explique en partie par la spécificité de ce rôle, qui diffère fortement des autres positions sur le terrain. Par extension, c’est aussi le poste le moins "vendeur" du football, ce qui se reflète dans leur valeur marchande.
+
 
 
 ---
