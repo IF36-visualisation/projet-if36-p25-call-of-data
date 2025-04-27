@@ -302,20 +302,85 @@ En résumé, les expected goals sont un bon indicateur des performances d’une 
 
 ---
 
-### **Question 4:** 
+### **Question 4:** Quel est l'impact des transferts sur la performance des clubs entre 2021-2022 et 2022-2023 ?
 
 
 #### 🎯 Objectif:
 
+Analyser l'évolution de la performance des clubs entre deux saisons (2021-2022 ➔ 2022-2023) en fonction de leur nombre de recrues durant l'été 2022.
+
+L'objectif est de voir s'il existe une corrélation entre l'activité sur le marché des transferts (quantité de recrutements) et l'évolution du classement d'une saison sur l'autre.
+
 
 
 ```{r}
-# Code
+# Regrouper les clubs qui ont recruté et compter
+nb_recrues_club <- transfers_clean %>%
+  group_by(club_to) %>%
+  summarise(nb_recrues = n(), .groups = "drop")
+
+# Préparer les classements par saison
+classements_2021_2022 <- team_stats_2021_2022 %>%
+  select(Squad, LgRk) %>%
+  rename(club = Squad, classement_2022 = LgRk)
+
+classements_2022_2023 <- team_stats_2022_2023 %>%
+  select(Squad, LgRk) %>%
+  rename(club = Squad, classement_2023 = LgRk)
+
+# Fusionner tout ensemble
+evolution_clubs <- classements_2021_2022 %>%
+  inner_join(classements_2022_2023, by = "club") %>%
+  left_join(nb_recrues_club, by = c("club" = "club_to")) %>%
+  mutate(
+    nb_recrues = replace_na(nb_recrues, 0),  # certains clubs peuvent avoir 0 recrutement
+    evolution_classement = classement_2022 - classement_2023
+  )
+
+# Pour la visualisation, créer des classes selon nombre de recrues
+evolution_clubs <- evolution_clubs %>%
+  mutate(
+    categorie_recrutement = case_when(
+      nb_recrues == 0 ~ "0 recrue",
+      nb_recrues <= 3 ~ "1-3 recrues",
+      nb_recrues <= 6 ~ "4-6 recrues",
+      TRUE ~ "7+ recrues"
+    )
+  )
+
+# Visualisation : boxplot pour voir la distribution de l'évolution du classement par catégorie de recrutement
+ggplot(evolution_clubs, aes(x = categorie_recrutement, y = evolution_classement, fill = categorie_recrutement)) +
+  geom_boxplot(alpha = 0.7) +
+  scale_fill_manual(values = c("lightblue", "skyblue", "blue", "darkblue")) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  labs(
+    title = "Impact du recrutement sur l'évolution du classement (2021-2023)",
+    subtitle = "Distribution de l'évolution de position en fonction du nombre de recrues estivales",
+    x = "Nombre de recrues (catégories)",
+    y = "Evolution du classement (positif = amélioration)",
+    fill = "Recrutements"
+  ) +
+  theme_minimal(base_size = 12)
+
+
 ```
 
 
 #### 🧠 Interprétation du graphique:
 
+Le graphique montre la relation entre le nombre de joueurs recrutés par un club durant l’été 2022 et l’évolution de son classement entre les saisons 2021-2022 et 2022-2023.
+L’évolution du classement est calculée en faisant le classement de la saison 2022 moins celui de la saison 2023. Un résultat positif signifie que le club s’est amélioré (il est monté dans le classement), tandis qu’un résultat négatif indique une baisse de performance.
 
+Globalement dans ce graphique, on observe que :
+
+Les clubs qui n'ont recruté aucun joueur ont eu des résultats très variables,ils affichent une médiane proche de zéro, donc peu d'impact.
+
+Les clubs qui ont recruté entre 1 et 3 joueurs ont plutôt vu leur classement se dégrader (médiane en dessous de 0).
+
+Les clubs ayant fait 4 à 6 recrues s’en sortent plutôt bien, avec une petite amélioration en moyenne et une médiane légérement supérieure à 0.
+
+Enfin, pour les clubs ayant recruté 7 joueurs ou plus, les résultats sont vraiment très variés : certains ont beaucoup progressé, d’autres ont fortement régressé. La médiane est plutôt négative, ce qui montre que recruter en masse ne garantit pas une amélioration du classement.
+
+En résumé, le graphique montre qu’il n’existe pas de lien clair entre le nombre de recrues et une amélioration du classement. Recruter beaucoup n'est pas toujours efficace, et une stratégie plus ciblée (recruter moins mais mieux) pourrait être plus rentable pour progresser.
 
 
