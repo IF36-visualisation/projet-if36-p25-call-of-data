@@ -111,7 +111,7 @@ Identifier les **20 clubs les plus actifs** lors du mercato d’été 2022 en te
 
 
 
-```{r}
+```{r message=FALSE}
 # Code
 
 # Nettoyage de base
@@ -175,16 +175,16 @@ ggplot(recrutements_top, aes(x = position, y = fct_reorder(club_to, nb_recrues),
 Visualiser la valeur marchande des joueurs par poste pour comprendre quels types de profils sont les plus prisés financièrement sur le marché. Cela permet de hiérarchiser les postes selon leur importance économique dans le football professionnel. Pour ça, on se base sur le mercato qui a eu lieu durant l'été 2022.
 
 
-```{r}
+```{r message=FALSE}
 
-# Nettoyage des données
 transfers_clean <- transfers_2022 %>%
   filter(!is.na(position), !is.na(market_value)) %>%
   distinct(name, position, age, .keep_all = TRUE) %>%
   mutate(
-    market_value_num = as.numeric(market_value)  # Convertir les valeurs en numérique
+    market_value = gsub("[^0-9\\.]", "", market_value),  # pour Retirer tout sauf chiffres et point
+    market_value_num = as.numeric(market_value)
   ) %>%
-  filter(market_value_num >= 1.5)  # Filtrer les valeurs négatives/nulles ou pas réalistes genre en dessous de 1.5 millions
+  filter(market_value_num >= 1.5)
 
 # On crée une colonne pour regrouper certains postes qui sont très proches
 transfers_clean <- transfers_clean %>%
@@ -229,35 +229,27 @@ ggplot(transfers_clean_stats, aes(x = reorder(position_fr, mean_value), y = mean
   theme_minimal(base_size = 12) +
   coord_flip()
 
-
-
-transfers_clean %>%
-  count(position_fr, sort = TRUE)
-print(transfers_clean %>% count(position_fr, sort = TRUE))
-
-
-
 ```
 
 
 #### 🧠 Interprétation du graphique:
-Attaquant et Buteur : Les attaquants sont les joueurs les plus valorisés sur le marché, avec une valeur moyenne qui dépasse largement celle des autres postes. Cela reflète l'importance des joueurs offensifs dans le football moderne, où les buts et les performances offensives sont souvent décisives mais surtout les attaquants sont souvent les joueurs qui attirent le plus l'attention des fans et des médias, ce qui en fait des atouts marketing précieux pour les clubs et qui explique leur valeur bien plus élevé
 
-Défenseur central : Les défenseurs centraux occupent la deuxième place en termes de valeur marchande. Leur rôle crucial dans la stabilité défensive et leur capacité à organiser la défense expliquent cette valorisation élevée. Un bon défenseur central peut être la clé de voûte d'une équipe solide et équilibrée.
+- 🔵 Attaquants sont les joueurs les plus valorisés sur le marché, avec une valeur moyenne bien supérieure aux autres postes. Cela reflète leur importance dans le football moderne où les performances offensives et l'impact marketing sont décisifs.
 
-Ailier droit et Ailier gauche : Les ailiers, qu’ils soient droits ou gauches, présentent une valeur marchande significative sur le marché des transferts avec respectivement la 3ème et 5ème place. Toutefois, on observe souvent une légère survalorisation des ailiers droits. Cette différence peut s’expliquer par la rareté relative des ailiers droits car cela implique souvent d'être gaucher, pour être capables de repiquer dans l’axe et de frapper avec leur pied fort. Ce profil est très recherché dans le football moderne d’où une valorisation plus élevée.
+- 🔵 Défenseurs centraux occupent la deuxième place en termes de valeur. Leur rôle dans la stabilité défensive et l'organisation du jeu explique cette valorisation élevée.
 
-Milieu central et offensif : Les milieux centraux, souvent considérés comme les "poumons" de l'équipe, sont également très valorisés. Leur polyvalence et leur capacité à influencer le jeu dans les deux sens en font des acteurs clés sur le marché. Paradoxalement, les milieux offensifs semblent être moins bien valorisés. C'est un poste qui, dans le football moderne, a perdu de sa splendeur par rapport à avant et c'est caractérisé par une baisse de la valeur marchande à ce poste.
+- 🔵 Ailiers droits et gauches présentent également des valeurs importantes, avec une survalorisation légère des ailiers droits, souvent gauchers et capables de repiquer dans l'axe, profil très recherché aujourd'hui.
 
-Défenseur gauche et Défenseur droit : Les défenseurs latéraux, bien que moins valorisés que les défenseurs centraux, restent importants.Ils sont très recherchés dans le football moderne car ils doivent être polyvalents, capables de défendre et d'attaquer efficacement.On ne retrouve pas la rareté des latéraux droit par rapport au gauche comme on peut avoir avec les ailiers et on remarque qu'à l'inverse les latéraux gauche on tendance à avoir une plus grosse valeur marchande. 
+- 🔵 Milieux centraux sont très valorisés grâce à leur polyvalence et leur influence dans le jeu, tandis que les milieux offensifs voient leur valeur décliner, en lien avec l’évolution des systèmes de jeu modernes.
 
-Gardien de but : Les gardiens de but sont nettement moins valorisés que les autres postes. Cela s’explique en partie par la spécificité de ce rôle, qui diffère fortement des autres positions sur le terrain. Par extension, c’est aussi le poste le moins "vendeur" du football, ce qui se reflète dans leur valeur marchande.
+- 🔵 Défenseurs latéraux (gauche et droit) restent recherchés pour leur polyvalence attaque/défense, avec une légère valeur supérieure pour les latéraux gauches.
 
-
+- 🔵 Gardiens de but sont nettement moins valorisés, leur poste étant moins "vendeur" et très spécifique par rapport aux autres.
 
 ---
 
-### **Question 3:** Corrélation entre xG et points ? 
+
+### **Question 3:** Corrélation entre xG (expected goals) et points ? 
 
 #### 🎯 Objectif:
 
@@ -265,7 +257,7 @@ Analyser si le nombre d’expected goals (xG) réalisés par une équipe est cor
 On utilise les données de la saison 2022-2023.
 
 
-```{r}
+```{r message=FALSE}
 # On utilise les données de la saison 2022-2023
 team_stats_22_23 <- team_stats_2022_2023 %>%
   select(Squad, xG, Pts)
@@ -282,23 +274,21 @@ ggplot(team_stats_22_23, aes(x = xG, y = Pts)) +
     title = "Corrélation entre Expected Goals (xG) et Points en championnat (2022-23)",
     x = "Expected Goals (xG)",
     y = "Points",
-    caption = "Source : 2022-2023 Football Team Stats.csv"
   ) +
   theme_minimal(base_size = 12)
-
-# Calcul du coefficient de corrélation de Pearson
-cor_xg_pts <- cor(team_stats_22_23$xG, team_stats_22_23$Pts, use = "complete.obs")
-paste0("Coefficient de corrélation de Pearson : ", round(cor_xg_pts, 3))
 
 ```
 
 
 #### 🧠 Interprétation du graphique:
-Le graphique montre qu’il existe une forte corrélation positive entre les expected goals (xG) et les points obtenus en championnat lors de la saison 2022-2023. Le coefficient de corrélation de Pearson est de 0,815, ce qui indique qu’en général, plus une équipe génère d’occasions de but de qualité (mesurées par les xG), plus elle obtient de points au classement. Cela confirme que produire beaucoup d’occasions est un élément important pour réussir sur toute une saison.
 
-Cependant, la relation n’est pas parfaite. On observe que certains points sont assez éloignés de la tendance générale. Cela peut s’expliquer par plusieurs facteurs, comme l’efficacité offensive, c’est-à-dire la capacité à transformer les occasions en buts, ou encore la solidité défensive. Une équipe peut créer beaucoup d’occasions mais manquer de réalisme ou encaisser trop de buts, ce qui limite son total de points.
+- 🔵 Le graphique montre une forte corrélation positive entre les expected goals (xG) et les points obtenus lors de la saison 2022-2023
 
-En résumé, les expected goals sont un bon indicateur des performances d’une équipe, mais ils ne suffisent pas à eux seuls pour expliquer complètement les résultats. D’autres aspects du jeu, comme la finition ou la défense, restent essentiels.
+- 🔵 Cela confirme que créer des occasions de qualité est un facteur clé de réussite sur une saison.
+
+- 🔵 Toutefois, certains clubs s'écartent de la tendance, montrant que l'efficacité offensive ou la solidité défensive influencent aussi fortement les résultats.
+
+- 🎯 En résumé, les xG sont un très bon indicateur de performance, mais ils doivent être combinés à d'autres aspects du jeu pour expliquer complètement le succès d'une équipe.
 
 ---
 
@@ -308,12 +298,11 @@ En résumé, les expected goals sont un bon indicateur des performances d’une 
 #### 🎯 Objectif:
 
 Analyser l'évolution de la performance des clubs entre deux saisons (2021-2022 ➔ 2022-2023) en fonction de leur nombre de recrues durant l'été 2022.
-
 L'objectif est de voir s'il existe une corrélation entre l'activité sur le marché des transferts (quantité de recrutements) et l'évolution du classement d'une saison sur l'autre.
 
 
 
-```{r}
+```{r message=FALSE}
 # Regrouper les clubs qui ont recruté et compter
 nb_recrues_club <- transfers_clean %>%
   group_by(club_to) %>%
@@ -368,19 +357,15 @@ ggplot(evolution_clubs, aes(x = categorie_recrutement, y = evolution_classement,
 
 #### 🧠 Interprétation du graphique:
 
-Le graphique montre la relation entre le nombre de joueurs recrutés par un club durant l’été 2022 et l’évolution de son classement entre les saisons 2021-2022 et 2022-2023.
-L’évolution du classement est calculée en faisant le classement de la saison 2022 moins celui de la saison 2023. Un résultat positif signifie que le club s’est amélioré (il est monté dans le classement), tandis qu’un résultat négatif indique une baisse de performance.
+-  Le graphique étudie la relation entre le nombre de joueurs recrutés durant l’été 2022 et l'évolution du classement entre 2021-2022 et 2022-2023.
 
-Globalement dans ce graphique, on observe que :
+- 🔵 Clubs sans recrues : résultats très variables, médiane proche de zéro.
 
-Les clubs qui n'ont recruté aucun joueur ont eu des résultats très variables,ils affichent une médiane proche de zéro, donc peu d'impact.
+- 🔵 1 à 3 recrues : tendance à une légère dégradation du classement.
 
-Les clubs qui ont recruté entre 1 et 3 joueurs ont plutôt vu leur classement se dégrader (médiane en dessous de 0).
+- 🔵 4 à 6 recrues : amélioration modérée, avec une médiane légèrement positive.
 
-Les clubs ayant fait 4 à 6 recrues s’en sortent plutôt bien, avec une petite amélioration en moyenne et une médiane légérement supérieure à 0.
+- 🔵 7 recrues ou plus : résultats très hétérogènes, avec une médiane plutôt négative, montrant que recruter massivement n'est pas une garantie de succès.
 
-Enfin, pour les clubs ayant recruté 7 joueurs ou plus, les résultats sont vraiment très variés : certains ont beaucoup progressé, d’autres ont fortement régressé. La médiane est plutôt négative, ce qui montre que recruter en masse ne garantit pas une amélioration du classement.
-
-En résumé, le graphique montre qu’il n’existe pas de lien clair entre le nombre de recrues et une amélioration du classement. Recruter beaucoup n'est pas toujours efficace, et une stratégie plus ciblée (recruter moins mais mieux) pourrait être plus rentable pour progresser.
-
+- 🎯 En résumé, le graphique souligne que recruter beaucoup n'est pas toujours efficace ; recruter intelligemment reste la meilleure stratégie pour progresser.
 
