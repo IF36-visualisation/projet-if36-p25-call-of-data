@@ -257,13 +257,12 @@ Gardien de but : Les gardiens de but sont nettement moins valorisés que les aut
 
 ---
 
-### **Question 3:** 
-
-Corrélation entre xG et points ?
+### **Question 3:** Corrélation entre xG et points ? 
 
 #### 🎯 Objectif:
 
 Analyser si le nombre d’expected goals (xG) réalisés par une équipe est corrélé avec son total de points en championnat. Cela permet de vérifier si produire beaucoup d’occasions (même sans forcément marquer) est un bon indicateur de performance globale.
+On utilise les données de la saison 2022-2023.
 
 
 ```{r}
