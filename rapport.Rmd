@@ -259,20 +259,47 @@ Gardien de but : Les gardiens de but sont nettement moins valorisés que les aut
 
 ### **Question 3:** 
 
+Corrélation entre xG et points ?
 
 #### 🎯 Objectif:
 
-
-
+Analyser si le nombre d’expected goals (xG) réalisés par une équipe est corrélé avec son total de points en championnat. Cela permet de vérifier si produire beaucoup d’occasions (même sans forcément marquer) est un bon indicateur de performance globale.
 
 
 ```{r}
-# Code
+# On utilise les données de la saison 2022-2023
+team_stats_22_23 <- team_stats_2022_2023 %>%
+  select(Squad, xG, Pts)
+
+# Nettoyage basique : on supprime les NA au cas où
+team_stats_22_23 <- team_stats_22_23 %>%
+  filter(!is.na(xG), !is.na(Pts))
+
+# Visualisation scatter plot
+ggplot(team_stats_22_23, aes(x = xG, y = Pts)) +
+  geom_point(color = "#1f77b4", size = 3) +
+  geom_smooth(method = "lm", se = FALSE, color = "red", linetype = "dashed") +
+  labs(
+    title = "Corrélation entre Expected Goals (xG) et Points en championnat (2022-23)",
+    x = "Expected Goals (xG)",
+    y = "Points",
+    caption = "Source : 2022-2023 Football Team Stats.csv"
+  ) +
+  theme_minimal(base_size = 12)
+
+# Calcul du coefficient de corrélation de Pearson
+cor_xg_pts <- cor(team_stats_22_23$xG, team_stats_22_23$Pts, use = "complete.obs")
+paste0("Coefficient de corrélation de Pearson : ", round(cor_xg_pts, 3))
+
 ```
 
 
 #### 🧠 Interprétation du graphique:
+Le graphique montre qu’il existe une forte corrélation positive entre les expected goals (xG) et les points obtenus en championnat lors de la saison 2022-2023. Le coefficient de corrélation de Pearson est de 0,815, ce qui indique qu’en général, plus une équipe génère d’occasions de but de qualité (mesurées par les xG), plus elle obtient de points au classement. Cela confirme que produire beaucoup d’occasions est un élément important pour réussir sur toute une saison.
 
+Cependant, la relation n’est pas parfaite. On observe que certains points sont assez éloignés de la tendance générale. Cela peut s’expliquer par plusieurs facteurs, comme l’efficacité offensive, c’est-à-dire la capacité à transformer les occasions en buts, ou encore la solidité défensive. Une équipe peut créer beaucoup d’occasions mais manquer de réalisme ou encaisser trop de buts, ce qui limite son total de points.
+
+En résumé, les expected goals sont un bon indicateur des performances d’une équipe, mais ils ne suffisent pas à eux seuls pour expliquer complètement les résultats. D’autres aspects du jeu, comme la finition ou la défense, restent essentiels.
 
 ---
 
