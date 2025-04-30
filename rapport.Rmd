@@ -3,9 +3,23 @@ title: "Rapport"
 author: "Ahamad MOHAMMAD; Minko Bikono NEIL-JOVY; Simon GELBART; Willen AMICHE"
 date: "`r Sys.Date()`"
 output:
-  pdf_document:
-    latex_engine: xelatex
+  prettydoc::html_pretty:
+    theme: cayman       
+    highlight: github   
+    toc: true
+    toc_depth: 3
+encoding: UTF-8
 ---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,     
+  warning = FALSE,  
+  message = FALSE   
+)
+```
+
 
 
 ## **Introduction**
@@ -104,10 +118,13 @@ transfers_2022 <- read.csv("data/2022_2023_football_summer_transfers.csv", sep =
 
 ---
 
-### **Question 1:** Quels clubs ont le plus recruté par poste (top 20) ?
+### **Question 1 : Quels clubs ont le plus recruté par poste (top 20) ?**
 
 #### 🎯 Objectif:
 Identifier les **20 clubs les plus actifs** lors du mercato d’été 2022 en termes de nombre de recrues, puis visualiser quels postes ont été ciblés en priorité par ces clubs. Cela permet de mieux comprendre les **stratégies de renforcement** des effectifs selon les lignes de jeu (défense, milieu, attaque).
+
+#### 🧪 Hypothèse :
+Nous supposons que les clubs ayant terminé en bas de classement ou nouvellement promus ont davantage recruté, notamment en défense et au milieu, dans une logique de **renforcement pour assurer le maintien**. À l’inverse, les clubs plus stables ou ambitieux auraient fait un recrutement plus ciblé et réparti entre les lignes.
 
 
 
@@ -150,29 +167,31 @@ ggplot(recrutements_top, aes(x = position, y = fct_reorder(club_to, nb_recrues),
 
 #### 🧠 Interprétation du graphique:
 
-- 🔵 **US Salernitana 1919** est le club qui a le plus recruté tous postes confondus, avec un **focus important sur les milieux offensifs** et **défenseurs centraux**.
+- 🔵 **US Salernitana 1919**, un club ayant lutté pour le maintien en Serie A, est celui qui a le plus recruté tous postes confondus, avec un **focus important sur les milieux offensifs** et **défenseurs centraux**. Cela **confirme notre hypothèse**.
 
-- 🔵 **US Lecce**, **US Cremonese** et **Udinese Calcio** (clubs italiens) montrent aussi une stratégie de **renforcement défensif**, particulièrement en **centre-back**.
+- 🔵 D’autres clubs comme **US Lecce**, **US Cremonese** et **Udinese Calcio**, également engagés dans la lutte pour le maintien, présentent aussi une stratégie de **renforcement défensif**, particulièrement au poste de **centre-back**.
 
-- 🔵 **Olympique de Marseille** et **Nottingham Forest** ont **diversifié leurs recrutements** sur plusieurs lignes, y compris **les ailes** (*left/right winger*).
+- 🔵 En revanche, certains clubs comme **Olympique de Marseille** ou **Nottingham Forest**, pourtant positionnés plus haut (ou avec de grandes ambitions), ont **diversifié leurs recrutements** sur plusieurs lignes, ce qui nuance l’hypothèse. Cela peut refléter une stratégie de **reconstruction d’effectif** ou de préparation à des compétitions européennes.
 
-- 🎯 On observe une **forte demande en milieux de terrain**, notamment :
-  - *Attacking Midfield*
-  - *Defensive Midfield*
-  - *Centre Midfield*
+- 🔵 On observe une **forte demande en milieux de terrain**, avec une concentration sur les postes de *milieu central*, *défensif* et *offensif*, ce qui correspond bien à l’idée que la maîtrise du milieu de terrain reste cruciale dans le football moderne.
 
--  Peu de clubs ont recruté plusieurs **gardiens**, ce qui est logique : un club n’en fait souvent venir qu’un seul par saison.
+- Peu de clubs ont recruté plusieurs **gardiens**, ce qui est conforme aux pratiques usuelles : un club ne recrute généralement qu’un seul gardien par saison.
 
--  Certains clubs comme **FC Empoli** ou **OGC Nice** présentent une stratégie de recrutement **équilibrée sur différentes lignes**, ce qui pourrait indiquer un **renouvellement global de l’effectif**.
+- Enfin, certains clubs comme **FC Empoli** ou **OGC Nice** ont adopté une stratégie plus équilibrée, en recrutant sur plusieurs lignes, ce qui peut traduire un **renouvellement global** plutôt qu’un ajustement spécifique.
+
+✅ **Conclusion** : l’hypothèse est **globalement confirmée** – les clubs les moins bien classés ont recruté plus, notamment en défense. Toutefois, des exceptions existent, liées à des objectifs plus stratégiques ou spécifiques (comme l’Europe ou le changement d’entraîneur).
 
 
 ---
 
-### **Question 2:** Quels postes sont les plus valorisés sur le marché ?
+### **Question 2: Quels postes sont les plus valorisés sur le marché ?**
 
 
 #### 🎯 Objectif:
-Visualiser la valeur marchande des joueurs par poste pour comprendre quels types de profils sont les plus prisés financièrement sur le marché. Cela permet de hiérarchiser les postes selon leur importance économique dans le football professionnel. Pour ça, on se base sur le mercato qui a eu lieu durant l'été 2022.
+Visualiser la valeur marchande des joueurs par poste pour comprendre quels types de profils sont les plus prisés financièrement sur le marché. Cela permet de hiérarchiser les postes selon leur importance économique dans le football professionnel, sur la base du mercato d’été 2022.
+
+#### 🧪 Hypothèse :
+Nous pensons que les **attaquants** seront les plus valorisés sur le marché, en raison de leur impact direct sur les résultats et leur potentiel marketing. Les **défenseurs centraux** et **milieux offensifs** devraient aussi avoir une valeur élevée. À l'inverse, les **gardiens** devraient être en bas de l’échelle.
 
 
 ```{r message=FALSE}
@@ -234,71 +253,68 @@ ggplot(transfers_clean_stats, aes(x = reorder(position_fr, mean_value), y = mean
 
 #### 🧠 Interprétation du graphique:
 
-- 🔵 Attaquants sont les joueurs les plus valorisés sur le marché, avec une valeur moyenne bien supérieure aux autres postes. Cela reflète leur importance dans le football moderne où les performances offensives et l'impact marketing sont décisifs.
+- 🔵 Les **attaquants** sont effectivement les plus valorisés, avec une moyenne largement supérieure aux autres postes. Cela confirme leur statut stratégique et commercial dans le football moderne.
 
-- 🔵 Défenseurs centraux occupent la deuxième place en termes de valeur. Leur rôle dans la stabilité défensive et l'organisation du jeu explique cette valorisation élevée.
+- 🔵 Les **défenseurs centraux** arrivent en seconde position, ce qui valide notre hypothèse selon laquelle leur solidité et leur rareté renforcent leur valeur.
 
-- 🔵 Ailiers droits et gauches présentent également des valeurs importantes, avec une survalorisation légère des ailiers droits, souvent gauchers et capables de repiquer dans l'axe, profil très recherché aujourd'hui.
+- 🔵 Les **ailiers droits** et **gauches** ont aussi une valeur notable, notamment en raison de profils rares et techniques (ex. : gauchers jouant à droite).
 
-- 🔵 Milieux centraux sont très valorisés grâce à leur polyvalence et leur influence dans le jeu, tandis que les milieux offensifs voient leur valeur décliner, en lien avec l’évolution des systèmes de jeu modernes.
+- 🔵 Les **milieux offensifs** sont un peu moins valorisés que prévu, ce qui peut s’expliquer par l’évolution des schémas tactiques où leur rôle est parfois absorbé par des ailiers ou des faux neufs.
 
-- 🔵 Défenseurs latéraux (gauche et droit) restent recherchés pour leur polyvalence attaque/défense, avec une légère valeur supérieure pour les latéraux gauches.
+- 🔵 Les **gardiens** sont clairement en bas du classement, confirmant qu’ils sont beaucoup moins valorisés sur le marché des transferts.
 
-- 🔵 Gardiens de but sont nettement moins valorisés, leur poste étant moins "vendeur" et très spécifique par rapport aux autres.
+✅ **Conclusion** : L’hypothèse est **largement confirmée**. Les attaquants et défenseurs centraux dominent le marché, tandis que les gardiens sont nettement moins cotés.
 
 ---
 
 
-### **Question 3:** Corrélation entre xG (expected goals) et points ? 
+### **Question 3 : Corrélation entre xG (expected goals) et points ?**
 
 #### 🎯 Objectif:
+Analyser si le nombre d’expected goals (xG) réalisés par une équipe est corrélé avec son total de points en championnat. Cela permet de vérifier si produire beaucoup d’occasions de qualité est un bon indicateur de performance globale. Données utilisées : saison 2022-2023.
 
-Analyser si le nombre d’expected goals (xG) réalisés par une équipe est corrélé avec son total de points en championnat. Cela permet de vérifier si produire beaucoup d’occasions (même sans forcément marquer) est un bon indicateur de performance globale.
-On utilise les données de la saison 2022-2023.
+#### 🧪 Hypothèse :
+Nous pensons qu’il existe une **corrélation positive significative** entre les xG et le total de points. Une équipe qui se crée beaucoup d’occasions de qualité a plus de chances de gagner des matchs, même si la finition varie.
 
 
 ```{r message=FALSE}
-# On utilise les données de la saison 2022-2023
 team_stats_22_23 <- team_stats_2022_2023 %>%
-  select(Squad, xG, Pts)
-
-# Nettoyage basique : on supprime les NA au cas où
-team_stats_22_23 <- team_stats_22_23 %>%
+  select(Squad, xG, Pts) %>%
   filter(!is.na(xG), !is.na(Pts))
 
-# Visualisation scatter plot
 ggplot(team_stats_22_23, aes(x = xG, y = Pts)) +
   geom_point(color = "#1f77b4", size = 3) +
-  geom_smooth(method = "lm", se = FALSE, color = "red", linetype = "dashed") +
+  geom_smooth(method = "lm", color = "red", linetype = "dashed", se = TRUE) +  # se = TRUE pour afficher l'intervalle
   labs(
     title = "Corrélation entre Expected Goals (xG) et Points en championnat (2022-23)",
     x = "Expected Goals (xG)",
-    y = "Points",
+    y = "Points"
   ) +
   theme_minimal(base_size = 12)
+
 
 ```
 
 
 #### 🧠 Interprétation du graphique:
 
-- 🔵 Le graphique montre une forte corrélation positive entre les expected goals (xG) et les points obtenus lors de la saison 2022-2023
+- 🔵 Le nuage de points présente une **tendance linéaire positive** entre les xG et les points, confirmée par la droite de régression.
 
-- 🔵 Cela confirme que créer des occasions de qualité est un facteur clé de réussite sur une saison.
+- 🔵 Cela suggère que les équipes qui se créent beaucoup d’occasions obtiennent en général plus de points, ce qui **valide notre hypothèse**.
 
-- 🔵 Toutefois, certains clubs s'écartent de la tendance, montrant que l'efficacité offensive ou la solidité défensive influencent aussi fortement les résultats.
+- 🔵 Certaines équipes dévient de la tendance (sous-performance ou efficacité maximale), ce qui montre que les xG ne suffisent pas à eux seuls à expliquer les résultats.
 
-- 🎯 En résumé, les xG sont un très bon indicateur de performance, mais ils doivent être combinés à d'autres aspects du jeu pour expliquer complètement le succès d'une équipe.
+✅ **Conclusion** : L’hypothèse est **confirmée**. Il existe une forte corrélation entre production offensive (xG) et performance en championnat.
 
 ---
 
-### **Question 4:** Quel est l'impact des transferts sur la performance des clubs entre 2021-2022 et 2022-2023 ?
-
+### **Question 4 : Quel est l'impact des transferts sur la performance des clubs entre 2021-2022 et 2022-2023 ?**
 
 #### 🎯 Objectif:
+Analyser l'évolution de la performance des clubs entre deux saisons (2021-2022 ➔ 2022-2023) en fonction de leur nombre de recrues durant l'été 2022. L’objectif est de voir s’il existe une corrélation entre le volume de recrutement et l’évolution du classement.
 
-Analyser l'évolution de la performance des clubs entre deux saisons (2021-2022 ➔ 2022-2023) en fonction de leur nombre de recrues durant l'été 2022.
-L'objectif est de voir s'il existe une corrélation entre l'activité sur le marché des transferts (quantité de recrutements) et l'évolution du classement d'une saison sur l'autre.
+#### 🧪 Hypothèse :
+Nous pensons que les clubs ayant recruté **modérément (4 à 6 joueurs)** progresseront davantage, car ils auront ciblé leurs besoins. Ceux qui ont **recruté massivement** risquent d’avoir des résultats plus hétérogènes à cause du manque de cohésion. Les clubs **n’ayant pas recruté** pourraient stagner ou régresser.
 
 
 
@@ -357,15 +373,13 @@ ggplot(evolution_clubs, aes(x = categorie_recrutement, y = evolution_classement,
 
 #### 🧠 Interprétation du graphique:
 
--  Le graphique étudie la relation entre le nombre de joueurs recrutés durant l’été 2022 et l'évolution du classement entre 2021-2022 et 2022-2023.
+- 🔵 Les clubs **sans recrues** présentent des résultats très variables, avec une médiane proche de zéro, ce qui confirme qu’un manque de renfort ne permet pas de progresser de manière fiable.
 
-- 🔵 Clubs sans recrues : résultats très variables, médiane proche de zéro.
+- 🔵 Les clubs ayant recruté **1 à 3 joueurs** semblent légèrement décliner, peut-être faute de renforts suffisants.
 
-- 🔵 1 à 3 recrues : tendance à une légère dégradation du classement.
+- 🔵 Les clubs ayant recruté **4 à 6 joueurs** montrent en moyenne une **amélioration du classement**, ce qui **confirme notre hypothèse principale**.
 
-- 🔵 4 à 6 recrues : amélioration modérée, avec une médiane légèrement positive.
+- 🔵 En revanche, les clubs avec **7 recrues ou plus** ont une médiane légèrement négative et une très grande dispersion, ce qui va dans le sens d’un **manque de stabilité** ou d’un effet “trop de changements tue la cohérence”.
 
-- 🔵 7 recrues ou plus : résultats très hétérogènes, avec une médiane plutôt négative, montrant que recruter massivement n'est pas une garantie de succès.
-
-- 🎯 En résumé, le graphique souligne que recruter beaucoup n'est pas toujours efficace ; recruter intelligemment reste la meilleure stratégie pour progresser.
+✅ **Conclusion** : L’hypothèse est **largement confirmée** : un recrutement ciblé et mesuré semble plus bénéfique qu’un mercato massif ou une inaction.
 
