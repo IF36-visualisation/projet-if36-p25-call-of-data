@@ -383,3 +383,343 @@ ggplot(evolution_clubs, aes(x = categorie_recrutement, y = evolution_classement,
 
 ✅ **Conclusion** : L’hypothèse est **largement confirmée** : un recrutement ciblé et mesuré semble plus bénéfique qu’un mercato massif ou une inaction.
 
+---
+
+
+### **Question 5 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** : 
+
+
+---
+
+### **Question 6 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 7 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 8 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 9 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 10 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 11 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 12 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 13 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 14 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 15 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 16 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 17 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 18 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 19 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 20 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+
+
