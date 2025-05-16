@@ -104,6 +104,11 @@ Même structure et signification que pour 2021-2022, mais avec la saison suivant
 
 library(tidyverse)
 library(ggplot2)
+library(scales)
+library(dplyr)
+library(stringr)
+library(ggalluvial)
+
 ```
 
 
@@ -286,7 +291,7 @@ ggplot(team_stats_22_23, aes(x = xG, y = Pts)) +
   geom_point(color = "#1f77b4", size = 3) +
   geom_smooth(method = "lm", color = "red", linetype = "dashed", se = TRUE) +  # se = TRUE pour afficher l'intervalle
   labs(
-    title = "Corrélation entre Expected Goals (xG) et Points en championnat (2022-23)",
+    title = "Corrélation entre Expected Goals (xG) et Points en championnat(2022-23)",
     x = "Expected Goals (xG)",
     y = "Points"
   ) +
@@ -386,88 +391,225 @@ ggplot(evolution_clubs, aes(x = categorie_recrutement, y = evolution_classement,
 ---
 
 
-### **Question 5 : **
+### **Question 5 : Quels sont les transferts les plus coûteux de l’été 2022 ? **
 
-#### 🎯 Objectif:
+#### 🎯 Objectif: 
+Identifier les joueurs ayant fait l’objet des transferts les plus onéreux durant le mercato estival 2022, afin de mieux comprendre où se concentrent les plus gros investissements du marché.
 
 
 #### 🧪 Hypothèse :
+Les attaquants et les jeunes espoirs prometteurs devraient constituer la majorité des transferts les plus chers, notamment en direction des grands clubs européens.
 
 
 
 ```{r}
+# Nettoyage des montants
+transferts_top <- transfers_2022 %>%
+  filter(!is.na(fee)) %>%
+  mutate(fee_num = str_extract(fee, "[0-9,.]+"),
+         fee_num = as.numeric(gsub(",", ".", fee_num))) %>%
+  filter(!is.na(fee_num)) %>%
+  arrange(desc(fee_num)) %>%
+  distinct(name, .keep_all = TRUE) %>%
+  slice_max(fee_num, n = 15)
+
+# Graphique
+ggplot(transferts_top, aes(x = reorder(name, fee_num), y = fee_num)) +
+  geom_col(fill = "#1f77b4") +
+  coord_flip() +
+  labs(
+    title = "Top 15 des transferts les plus chers – Été 2022",
+    x = "Joueur",
+    y = "Montant du transfert (en millions €)"
+  ) +
+  theme_minimal(base_size = 12)
 
 ```
 
 
 #### 🧠 Interprétation du graphique:
 
+- 🔵 Le graphique met en évidence les 15 plus grosses transactions du mercato d’été 2022.
 
-✅ **Conclusion** : 
+- 🔵 Une forte majorité des joueurs sont des profils offensifs : attaquants ou milieux créatifs.
+
+- 🔵 On retrouve principalement des clubs disposant d’un fort pouvoir d’achat, issus de la Premier League ou des grands championnats européens.
+
+- 🔵 Les sommes engagées confirment l’importance stratégique de certains postes et le pari sur le potentiel futur des jeunes joueurs.
+
+
+✅ **Conclusion** :  L’hypothèse est confirmée. Les plus grosses dépenses concernent surtout des joueurs offensifs ou très jeunes, recrutés par des clubs ambitieux financièrement. Cela illustre la concentration des investissements sur des profils à fort impact ou à forte valeur de revente.
+
+---
+
+### **Question 6 : Quelle part des buts est marquée par des recrues (top 10) **
+
+#### 🎯 Objectif:
+Mesurer la contribution directe des joueurs recrutés à l’été 2022 dans le total des buts marqués par leur club en 2022-2023.
+
+#### 🧪 Hypothèse :
+Les recrues, devraient représenter une part importante des buts dans les clubs ayant beaucoup investi.
+
+
+
+```{r}
+# Nettoyage des données de transfert
+transfers_cleaned <- transfers_2022 %>%
+  filter(!is.na(club_to), !is.na(name)) %>%
+  distinct(name, club_to)
+
+# Nettoyage et regroupement des joueurs recrutés
+recrues_stats <- player_stats_2021_2022 %>%
+  rename(name = Player, club = Squad, buts = Goals, minutes = Min) %>%
+  mutate(name = str_trim(name)) %>%
+  inner_join(transfers_cleaned, by = "name") %>%
+  filter(!is.na(buts)) %>%
+  group_by(club_to) %>%
+  summarise(buts_recrues = sum(as.numeric(buts), na.rm = TRUE), .groups = "drop")
+
+# Buts totaux par club (2022-2023)
+buts_totaux <- team_stats_2022_2023 %>%
+  rename(club = Squad) %>%
+  select(club, GF)
+
+# Fusion des datasets
+part_buts <- buts_totaux %>%
+  left_join(recrues_stats, by = c("club" = "club_to")) %>%
+  mutate(
+    buts_recrues = replace_na(buts_recrues, 0),
+    part_recrues = buts_recrues / GF
+  ) %>%
+  filter(GF > 0, part_recrues > 0) %>% # on garde uniquement les clubs actifs
+  arrange(desc(part_recrues)) %>%
+  slice_max(part_recrues, n = 10)
+
+# Visualisation en barres horizontales
+ggplot(part_buts, aes(x = reorder(club, part_recrues), y = part_recrues)) +
+  geom_col(fill = "#0072B2") +
+  coord_flip() +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  labs(
+    title = "Part des buts marqués par des recrues (Top 10 clubs)",
+    x = "Club",
+    y = "Part des buts (%)"
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+- 🔵 Le graphique met en valeur les 10 clubs où les recrues ont contribué de manière significative au total des buts.
+
+- 🔵 Cela confirme l’impact potentiel des nouveaux joueurs sur le rendement offensif d’une équipe, surtout en cas de bonne intégration.
+
+✅ **Conclusion** :  L’hypothèse est partiellement confirmée. Dans certains clubs, les recrues ont été déterminantes offensivement. Dans d’autres, leur impact a été plus indirect. La contribution dépend donc fortement du profil des joueurs recrutés et du besoin tactique identifié.
+
 
 
 ---
 
-### **Question 6 : **
+### **Question 7 : Quel est le rendement des recrues vs anciens **
 
 #### 🎯 Objectif:
+Comparer l’efficacité offensive des recrues vs les joueurs déjà présents.
+
 
 
 #### 🧪 Hypothèse :
-
+Les joueurs déjà intégrés au collectif devraient avoir un meilleur rendement offensif, car les recrues ont souvent besoin de temps pour s’adapter.
 
 
 ```{r}
+# Liste des recrues (nom + club)
+recrues <- transfers_2022 %>%
+  filter(!is.na(name)) %>%
+  distinct(name) %>%
+  mutate(statut = "Recrue")
 
+# Données joueurs avec efficacité offensive
+rendement_joueurs <- player_stats_2021_2022 %>%
+  rename(name = Player, buts = Goals, minutes = Min) %>%
+  mutate(name = str_trim(name),
+         buts = as.numeric(buts),
+         minutes = as.numeric(minutes),
+         rendement = buts / minutes) %>%
+  filter(!is.na(rendement), minutes > 200) %>%
+  mutate(statut = ifelse(name %in% recrues$name, "Recrue", "Déjà présent"))
+
+# Visualisation : violin plot du rendement
+ggplot(rendement_joueurs, aes(x = statut, y = rendement, fill = statut)) +
+  geom_violin(trim = FALSE, alpha = 0.7) +
+  geom_boxplot(width = 0.1, color = "black", outlier.shape = NA) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
+  labs(
+    title = "Rendement offensif : Recrues vs Joueurs déjà présents",
+    x = "",
+    y = "Buts par minute jouée"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "none")
 ```
 
 
 #### 🧠 Interprétation du graphique:
 
+- 🔵 La forme du violin plot montre la distribution complète du rendement offensif.
 
-✅ **Conclusion** :  
+- 🔵 Les joueurs déjà présents présentent une distribution plus homogène et une médiane plus élevée.
+
+- 🔵 Les recrues ont un rendement plus variable : certains très efficaces, mais aussi de nombreux cas en dessous de la médiane des anciens.
+
+✅ **Conclusion** :  L’hypothèse est globalement confirmée. Les joueurs déjà présents affichent un meilleur rendement moyen que les recrues, ce qui reflète sans doute une meilleure adaptation au système de jeu. Cependant, certaines recrues affichent des performances remarquables, ce qui montre leur potentiel une fois intégrées.
 
 ---
 
-### **Question 7 : **
+### **Question 8 : Recrutement local vs international? (top 15)**
 
 #### 🎯 Objectif:
-
+Visualiser la répartition géographique du top 15 des recrutements pour évaluer dans quelle mesure les clubs recrutent localement ou à l’international.
 
 #### 🧪 Hypothèse :
-
+Les grands clubs européens recrutent principalement à l’international, tandis que les clubs de second rang privilégient les transferts nationaux pour des raisons de coût et de logistique.
 
 
 ```{r}
+# Identifier les 15 pays qui ont recruté le plus
+top_pays <- transfers_2022 %>%
+  filter(!is.na(country_to)) %>%
+  count(country_to, name = "nb_total") %>%
+  top_n(15, nb_total) %>%
+  pull(country_to)
 
+# Préparer les données filtrées
+transfers_local_vs_intl <- transfers_2022 %>%
+  filter(!is.na(country_from), !is.na(country_to)) %>%
+  mutate(type = ifelse(country_from == country_to, "National", "International")) %>%
+  count(country_to, type, name = "nb_transferts") %>%
+  filter(country_to %in% top_pays)
+
+# Barplot groupé 
+ggplot(transfers_local_vs_intl, aes(x = reorder(country_to, -nb_transferts), y = nb_transferts, fill = type)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Recrutements nationaux vs internationaux (Top 15 pays – été 2022)",
+    x = "Pays de destination",
+    y = "Nombre de transferts",
+    fill = "Type de transfert"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 
 #### 🧠 Interprétation du graphique:
 
+- 🔵 Certains pays comme l’Allemagne ou l’Espagne ont un bon équilibre entre local et international.
 
-✅ **Conclusion** :  
-
----
-
-### **Question 8 : **
-
-#### 🎯 Objectif:
+- 🔵 Les clubs des championnats secondaires recrutent davantage localement, contrairement aux clubs anglais ou italiens.
 
 
-#### 🧪 Hypothèse :
-
-
-
-```{r}
-
-```
-
-
-#### 🧠 Interprétation du graphique:
-
-
-✅ **Conclusion** :  
+✅ **Conclusion** :  L’hypothèse est confirmée. Le recrutement international est prépondérant dans les grands championnats, mais des flux internes nationaux importants subsistent dans certains pays. La carte des transferts illustre une géopolitique du football bien ancrée.
 
 ---
 
