@@ -346,6 +346,38 @@ Nous pensons que les clubs ayant recruté **modérément (4 à 6 joueurs)** prog
 
 
 ```{r message=FALSE}
+
+# Regrouper les clubs qui ont recruté et compter
+nb_recrues_club <- transfers_clean %>%
+  group_by(club_to) %>%
+  summarise(nb_recrues = n(), .groups = "drop")
+
+# Préparer les classements par saison
+classements_2021_2022 <- team_stats_2021_2022 %>%
+  select(Squad, LgRk) %>%
+  rename(club = Squad, classement_2022 = LgRk)
+
+classements_2022_2023 <- team_stats_2022_2023 %>%
+  select(Squad, LgRk) %>%
+  rename(club = Squad, classement_2023 = LgRk)
+
+# Fusionner tout ensemble
+evolution_clubs <- classements_2021_2022 %>%
+  inner_join(classements_2022_2023, by = "club") %>%
+  left_join(nb_recrues_club, by = c("club" = "club_to")) %>%
+  mutate(
+    nb_recrues = replace_na(nb_recrues, 0),  # certains clubs peuvent avoir 0 recrutement
+    evolution_classement = classement_2022 - classement_2023
+  ) %>%
+  mutate(
+    categorie_recrutement = case_when(
+      nb_recrues == 0 ~ "0 recrue",
+      nb_recrues <= 3 ~ "1-3 recrues",
+      nb_recrues <= 6 ~ "4-6 recrues",
+      TRUE ~ "7+ recrues"
+    )
+  )
+
 # Visualisation : boxplot avec palette corrigée
 ggplot(evolution_clubs, aes(x = categorie_recrutement, y = evolution_classement, fill = categorie_recrutement)) +
   geom_boxplot(alpha = 0.8) +
@@ -366,9 +398,7 @@ ggplot(evolution_clubs, aes(x = categorie_recrutement, y = evolution_classement,
     fill = "Recrutements"
   ) +
   theme_minimal(base_size = 12) +
-  theme(
-    legend.position = "right"
-  )
+  theme(legend.position = "right")
 
 
 ```
