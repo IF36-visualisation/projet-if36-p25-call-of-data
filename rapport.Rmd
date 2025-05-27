@@ -23,8 +23,10 @@ knitr::opts_chunk$set(
 
 
 ## **Introduction**
+L’objectif de ce projet est d’explorer l’impact des stratégies de recrutement sur les performances sportives des clubs de football et de leurs joueurs. En croisant des statistiques individuelles (performances des joueurs), des données collectives (résultats d’équipes) et les transferts réalisés lors du mercato estival 2022, nous cherchons à identifier les leviers de performance et à mieux comprendre les choix stratégiques opérés par les clubs.
+Notre analyse se base sur deux saisons complètes (2021-2022 et 2022-2023), afin de mesurer l’évolution des résultats d’une année sur l’autre et de relier cette évolution aux dynamiques de recrutement. À travers plusieurs angles d’analyse (volume de transferts, postes ciblés, valeur marchande, origine des joueurs, rendement, etc.), nous chercherons à répondre à une série de questions permettant de quantifier et qualifier l'effet des recrutements sur la réussite des équipes.
 
-Notre objectif est d’explorer l’impact des stratégies de recrutement sur les performances sportives des clubs et joueurs. En combinant des statistiques individuelles, collectives et des données de transferts, nous chercherons à identifier les tendances qui influencent la réussite des équipes sur plusieurs saisons. 
+ 
 
 
 ### **📊 Description des variables**
@@ -121,6 +123,39 @@ team_stats_2022_2023 <- read.csv("data/2022-2023 Football Team Stats.csv", sep =
 transfers_2022 <- read.csv("data/2022_2023_football_summer_transfers.csv", sep = ",", fileEncoding = "ISO-8859-1")
 ```
 
+
+```{r}
+# Traduction des postes 
+transfers_2022 <- transfers_2022 %>%
+  mutate(position = str_trim(position)) %>%
+  mutate(position = recode(position,
+    "Centre-Forward" = "Attaquant",
+    "Second Striker" = "Attaquant",
+    "Forward Attacker" = "Attaquant",
+    "attack" = "Attaquant",
+
+    "Right Winger" = "Ailier droit",
+    "Right Midfield" = "Ailier droit",
+
+    "Left Winger" = "Ailier gauche",
+    "Left Midfield" = "Ailier gauche",
+
+    "Attacking Midfield" = "Milieu offensif",
+    "Defensive Midfield" = "Milieu défensif",
+    "Central Midfield" = "Milieu central",
+
+    "Centre-Back" = "Défenseur central",
+    "defence" = "Défenseur central",
+    "Left-Back" = "Défenseur gauche",
+    "Right-Back" = "Défenseur droit",
+
+    "Goalkeeper" = "Gardien de but",
+
+    .default = "Autre"
+  ))
+
+```
+
 ---
 
 ### **Question 1 : Quels clubs ont le plus recruté par poste (top 20) ?**
@@ -201,74 +236,61 @@ Nous pensons que les **attaquants** seront les plus valorisés sur le marché, e
 
 ```{r message=FALSE}
 
+# Nettoyage et préparation des données de transfert
 transfers_clean <- transfers_2022 %>%
   filter(!is.na(position), !is.na(market_value)) %>%
   distinct(name, position, age, .keep_all = TRUE) %>%
   mutate(
-    market_value = gsub("[^0-9\\.]", "", market_value),  # pour Retirer tout sauf chiffres et point
+    market_value = gsub("[^0-9\\.]", "", market_value), 
     market_value_num = as.numeric(market_value)
   ) %>%
   filter(market_value_num >= 1.5)
 
-# On crée une colonne pour regrouper certains postes qui sont très proches
-transfers_clean <- transfers_clean %>%
-  mutate(position_fr = position) %>%
-  mutate(position_fr = recode(position_fr,
-                              "Second Striker" = "Attaquant",
-                              "Centre-Forward" = "Attaquant",
-                              "Forward Attacker" = "Attaquant",
-                              "attack" = "Attaquant",
-                              "Right Midfield" = "Ailier droit",
-                              "Left Midfield" = "Ailier gauche",
-                              "Attacking Midfield" = "Milieu offensif",
-                              "Central Midfield" = "Milieu central",
-                              "Defensive Midfield" = "Milieu central", 
-                              "Centre-Back" = "Défenseur central",
-                              "defence" = "Défenseur central",
-                              "Right Winger" = "Ailier droit",
-                              "Left Winger" = "Ailier gauche", 
-                              "Left-Back" = "Défenseur gauche",
-                              "Right-Back" = "Défenseur droit",
-                              "Goalkeeper" = "Gardien de but",
-                              .default = position_fr))  # Par défaut, on garde la position d'origine
-
 # Calcul de la moyenne et de l'écart-type des valeurs marchandes par poste
 transfers_clean_stats <- transfers_clean %>%
-  group_by(position_fr) %>%
-  filter(n() >= 5) %>%  
+  group_by(position) %>%
+  filter(n() >= 5) %>%
   summarise(
     mean_value = mean(market_value_num, na.rm = TRUE),
     sd_value = sd(market_value_num, na.rm = TRUE)
   )
 
-# Visualisation avec un barplot et des barres d'erreur pour voir les postes qui ont une grosse différence de prix
-ggplot(transfers_clean_stats, aes(x = reorder(position_fr, mean_value), y = mean_value)) +
+# Visualisation avec titres en français
+ggplot(transfers_clean_stats, aes(x = reorder(position, mean_value), y = mean_value)) +
   geom_bar(stat = "identity", fill = "#4CAF50") +  
   geom_errorbar(aes(ymin = pmax(mean_value - sd_value, 0), ymax = mean_value + sd_value), width = 0.2) +
   labs(
     title = "Valeur marchande moyenne par poste (mercato été 2022)",
-    x = "Poste",
-    y = "Valeur marchande moyenne (Millions d'€)"
+    x = "Poste (en anglais)",
+    y = "Valeur marchande moyenne (en millions d'euros)"
   ) +
   theme_minimal(base_size = 12) +
   coord_flip()
 
+
 ```
 
 
-#### 🧠 Interprétation du graphique:
+#### 🧠 Interprétation du graphique :
 
-- 🔵 Les **attaquants** sont effectivement les plus valorisés, avec une moyenne largement supérieure aux autres postes. Cela confirme leur statut stratégique et commercial dans le football moderne.
+Ce graphique combine deux informations importantes :
 
-- 🔵 Les **défenseurs centraux** arrivent en seconde position, ce qui valide notre hypothèse selon laquelle leur solidité et leur rareté renforcent leur valeur.
+- les barres vertes indiquent la valeur marchande moyenne des joueurs par poste ;
 
-- 🔵 Les **ailiers droits** et **gauches** ont aussi une valeur notable, notamment en raison de profils rares et techniques (ex. : gauchers jouant à droite).
+- les barres noires (barres d’erreur) représentent l’écart-type, c’est-à-dire la variabilité des valeurs selon les profils.
 
-- 🔵 Les **milieux offensifs** sont un peu moins valorisés que prévu, ce qui peut s’expliquer par l’évolution des schémas tactiques où leur rôle est parfois absorbé par des ailiers ou des faux neufs.
+- 🔵 Les attaquants sont effectivement les plus valorisés, avec une moyenne nettement supérieure. Cela confirme leur rôle stratégique et commercial. Leur forte variabilité montre que certains sont recrutés à prix très élevé, tirant la moyenne vers le haut.
 
-- 🔵 Les **gardiens** sont clairement en bas du classement, confirmant qu’ils sont beaucoup moins valorisés sur le marché des transferts.
+- 🔵 Les défenseurs centraux arrivent en seconde position, avec une valeur moyenne élevée et une dispersion plus contenue, signe d’une reconnaissance stable de leur importance.
 
-✅ **Conclusion** : L’hypothèse est **largement confirmée**. Les attaquants et défenseurs centraux dominent le marché, tandis que les gardiens sont nettement moins cotés.
+- 🔵 Les ailiers droits et gauches présentent aussi des valeurs élevées, ce qui reflète la rareté de certains profils très recherchés (notamment les ailiers gauchers jouant à droite).
+
+- 🔵 Les milieux offensifs sont un peu moins valorisés que prévu, et affichent une grande hétérogénéité : cela suggère une disparité importante entre quelques stars très coûteuses et d’autres profils plus modestes.
+
+- 🔵 Les gardiens sont les moins valorisés, avec une moyenne basse et une variabilité plus réduite, ce qui traduit leur statut secondaire sur le marché.
+
+✅ Conclusion : L’hypothèse est largement confirmée. Les attaquants et défenseurs centraux dominent en valeur. L’ajout des barres d’erreur révèle aussi des disparités fortes sur certains postes, notamment offensifs, ce qui enrichit l’analyse au-delà des moyennes seules.
+
 
 ---
 
@@ -276,7 +298,7 @@ ggplot(transfers_clean_stats, aes(x = reorder(position_fr, mean_value), y = mean
 ### **Question 3 : Corrélation entre xG (expected goals) et points ?**
 
 #### 🎯 Objectif:
-Analyser si le nombre d’expected goals (xG) réalisés par une équipe est corrélé avec son total de points en championnat. Cela permet de vérifier si produire beaucoup d’occasions de qualité est un bon indicateur de performance globale. Données utilisées : saison 2022-2023.
+Analyser si le nombre d’expected goals (xG) réalisés par une équipe est corrélé avec son total de points en championnat. Cela permet de vérifier si produire beaucoup d’occasions de qualité est un bon indicateur de performance globale. Les expected goals (xG) mesurent la probabilité qu’un tir se transforme en but, en fonction de facteurs comme la position du tir, le type d’action, l’angle de tir ou la pression défensive. En somme, plus une équipe cumule d’xG, plus elle est censée marquer. Données utilisées : saison 2022-2023.
 
 #### 🧪 Hypothèse :
 Nous pensons qu’il existe une **corrélation positive significative** entre les xG et le total de points. Une équipe qui se crée beaucoup d’occasions de qualité a plus de chances de gagner des matchs, même si la finition varie.
@@ -324,53 +346,29 @@ Nous pensons que les clubs ayant recruté **modérément (4 à 6 joueurs)** prog
 
 
 ```{r message=FALSE}
-# Regrouper les clubs qui ont recruté et compter
-nb_recrues_club <- transfers_clean %>%
-  group_by(club_to) %>%
-  summarise(nb_recrues = n(), .groups = "drop")
-
-# Préparer les classements par saison
-classements_2021_2022 <- team_stats_2021_2022 %>%
-  select(Squad, LgRk) %>%
-  rename(club = Squad, classement_2022 = LgRk)
-
-classements_2022_2023 <- team_stats_2022_2023 %>%
-  select(Squad, LgRk) %>%
-  rename(club = Squad, classement_2023 = LgRk)
-
-# Fusionner tout ensemble
-evolution_clubs <- classements_2021_2022 %>%
-  inner_join(classements_2022_2023, by = "club") %>%
-  left_join(nb_recrues_club, by = c("club" = "club_to")) %>%
-  mutate(
-    nb_recrues = replace_na(nb_recrues, 0),  # certains clubs peuvent avoir 0 recrutement
-    evolution_classement = classement_2022 - classement_2023
-  )
-
-# Pour la visualisation, créer des classes selon nombre de recrues
-evolution_clubs <- evolution_clubs %>%
-  mutate(
-    categorie_recrutement = case_when(
-      nb_recrues == 0 ~ "0 recrue",
-      nb_recrues <= 3 ~ "1-3 recrues",
-      nb_recrues <= 6 ~ "4-6 recrues",
-      TRUE ~ "7+ recrues"
-    )
-  )
-
-# Visualisation : boxplot pour voir la distribution de l'évolution du classement par catégorie de recrutement
+# Visualisation : boxplot avec palette corrigée
 ggplot(evolution_clubs, aes(x = categorie_recrutement, y = evolution_classement, fill = categorie_recrutement)) +
-  geom_boxplot(alpha = 0.7) +
-  scale_fill_manual(values = c("lightblue", "skyblue", "blue", "darkblue")) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_boxplot(alpha = 0.8) +
+  scale_fill_manual(
+    values = c(
+      "0 recrue" = "#f8766d",        
+      "1-3 recrues" = "#f1c40f",     
+      "4-6 recrues" = "#2ecc71",    
+      "7+ recrues" = "#3498db"      
+    )
+  ) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
   labs(
     title = "Impact du recrutement sur l'évolution du classement (2021-2023)",
     subtitle = "Distribution de l'évolution de position en fonction du nombre de recrues estivales",
     x = "Nombre de recrues (catégories)",
-    y = "Evolution du classement (positif = amélioration)",
+    y = "Évolution du classement (positif = amélioration)",
     fill = "Recrutements"
   ) +
-  theme_minimal(base_size = 12)
+  theme_minimal(base_size = 12) +
+  theme(
+    legend.position = "right"
+  )
 
 
 ```
@@ -378,13 +376,13 @@ ggplot(evolution_clubs, aes(x = categorie_recrutement, y = evolution_classement,
 
 #### 🧠 Interprétation du graphique:
 
-- 🔵 Les clubs **sans recrues** présentent des résultats très variables, avec une médiane proche de zéro, ce qui confirme qu’un manque de renfort ne permet pas de progresser de manière fiable.
+- 🔵 Les clubs n’ayant recruté aucun joueur présentent des résultats très variables, avec une médiane proche de zéro. Cela suggère qu’en l’absence de renfort, il est difficile de progresser de manière structurée, et que la stabilité seule ne suffit pas toujours.
 
-- 🔵 Les clubs ayant recruté **1 à 3 joueurs** semblent légèrement décliner, peut-être faute de renforts suffisants.
+- 🔵 Les clubs ayant recruté entre 1 et 3 joueurs semblent en légère régression. Ce type de recrutement limité peut refléter un ajustement insuffisant face aux besoins de l’effectif.
 
-- 🔵 Les clubs ayant recruté **4 à 6 joueurs** montrent en moyenne une **amélioration du classement**, ce qui **confirme notre hypothèse principale**.
+- 🔵 En revanche, les clubs ayant recruté entre 4 et 6 joueurs enregistrent en moyenne une amélioration de leur classement. Cela semble indiquer qu’un renforcement ciblé, sans bouleverser l’équilibre collectif, est plus efficace.
 
-- 🔵 En revanche, les clubs avec **7 recrues ou plus** ont une médiane légèrement négative et une très grande dispersion, ce qui va dans le sens d’un **manque de stabilité** ou d’un effet “trop de changements tue la cohérence”.
+- 🔵 À l’opposé, les clubs ayant recruté 7 joueurs ou plus affichent une médiane négative et une forte dispersion des résultats. Cela peut s’expliquer par une perte de repères au sein du groupe : remplacer trop de joueurs à la fois nuit à la cohésion et impose de reconstruire l’esprit d’équipe, ce qui peut ralentir les performances sportives.
 
 ✅ **Conclusion** : L’hypothèse est **largement confirmée** : un recrutement ciblé et mesuré semble plus bénéfique qu’un mercato massif ou une inaction.
 
