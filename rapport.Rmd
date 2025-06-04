@@ -1,6 +1,6 @@
 ---
-title: "Rapport"
-author: "Ahamad MOHAMMAD; Minko Bikono NEIL-JOVY; Simon GELBART; Willen AMICHE"
+title: "Rapport IF36"
+author: "Ahamad MOHAMMAD, Minko Bikono NEIL-JOVY, Simon GELBART, Willen AMICHE"
 date: "`r Sys.Date()`"
 output:
   prettydoc::html_pretty:
@@ -641,7 +641,7 @@ ggplot(transfers_local_vs_intl, aes(x = reorder(country_to, -nb_transferts), y =
 
 ---
 
-### **Question 9 : **
+### **Question 9 : Quels clubs misent sur des jeunes joueurs ?**
 
 #### 🎯 Objectif:
 
@@ -662,7 +662,7 @@ ggplot(transfers_local_vs_intl, aes(x = reorder(country_to, -nb_transferts), y =
 
 ---
 
-### **Question 10 : **
+### **Question 10 :Quelles équipes sont les plus "chanceuses" ou "malchanceuses" ? **
 
 #### 🎯 Objectif:
 
