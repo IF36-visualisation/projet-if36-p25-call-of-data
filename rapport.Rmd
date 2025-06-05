@@ -899,12 +899,11 @@ Ce résultat suggère que le volume seul ne suffit pas à prédire la performanc
 ### **Question 12 : Quels clubs sont les plus dépendants de leur meilleur buteur ?**
 
 #### 🎯 Objectif: 
-
 Évaluer dans quelle mesure chaque club dépend de son meilleur buteur pour marquer des buts lors de la saison 2021-2022.
 
 
-#### 🧪 Hypothèse :
 
+#### 🧪 Hypothèse :
 Certains clubs dépendent fortement d’un seul joueur pour marquer des buts. Cette dépendance peut poser un risque stratégique (blessure, transfert, méforme).
 
 
@@ -943,57 +942,34 @@ ggplot(top_dependance, aes(x = reorder(Squad, dep_buteur), y = dep_buteur)) +
 
 
 #### 🧠 Interprétation du graphique:
-
 Ce graphique montre la part des buts marqués par le meilleur buteur dans chaque club. Un taux élevé signifie que l'équipe est fortement dépendante d’un seul joueur offensivement.
 
 Getafe est le club le plus dépendant avec près de 48% des buts inscrits par Enes Ünal.
 
 Norwich City suit de près avec Teemu Pukki, auteur de 48% des buts du club également.
 
-D'autres clubs comme Alavés, Espanyol ou Celta Vigo dépassent également 40% de dépendance.
+D'autres clubs comme Alavés, Espanyol  dépassent également 40% de dépendance.
 
 📉 Ces clubs courent un risque plus élevé si leur buteur est absent ou inefficace : leur rendement offensif peut chuter brutalement.
+
+
 
 ✅ **Conclusion** :  
 Ce graphique met en évidence que certains clubs reposent quasiment à moitié sur un seul joueur pour marquer. Cela suggère une dépendance tactique risquée, qui devrait être prise en compte dans la stratégie sportive (recrutement, distribution du jeu, etc.).
 À l’inverse, les clubs avec une dépendance plus faible bénéficient d’un jeu offensif plus collectif, souvent plus résilient à l’échelle d’une saison.
+
 ---
 
-### **Question 13 : Quels sont les postes les plus recrutés l’été 2022 ? **
+### **Question 13 :  **
 
 #### 🎯 Objectif:
-Identifier les postes les plus ciblés par les clubs lors du mercato estival 2022, afin de dégager les priorités ou les tendances de recrutement (ex : renforcement offensif, stabilité défensive…).
+
 
 #### 🧪 Hypothèse :
-Les clubs ont principalement renforcé leur ligne offensive, avec une majorité de recrues jouant à des postes d’attaquants ou milieux offensifs.
 
 
 ```{r}
-# On reprend la table transfers_2022 avec les postes traduits
-library(treemap)
 
-# Comptage du nombre de recrues par poste
-postes_recrutement <- transfers_2022 %>%
-  count(position) %>%
-  arrange(desc(n))
-
-# Treemap
-treemap(postes_recrutement,
-        index = "position",
-        vSize = "n",
-        type = "index",
-        palette = "Set2",
-        title = "Répartition des postes recrutés – Été 2022")
-
-ggplot(postes_recrutement, aes(x = reorder(position, n), y = n)) +
-  geom_col(fill = "#56B4E9") +
-  coord_flip() +
-  labs(
-    title = "Nombre de joueurs recrutés par poste – Été 2022",
-    x = "Poste",
-    y = "Nombre de recrues"
-  ) +
-  theme_minimal()
 
 ```
 
@@ -1005,7 +981,7 @@ ggplot(postes_recrutement, aes(x = reorder(position, n), y = n)) +
 
 ---
 
-### **Question 14 : Les investissements ont-ils amélioré les résultats sportifs ?**
+### **Question 14 :**
 
 #### 🎯 Objectif:
 
@@ -1015,39 +991,6 @@ ggplot(postes_recrutement, aes(x = reorder(position, n), y = n)) +
 
 
 ```{r}
-# Nettoyage de la variable "fee" (valeur du transfert)
-transfers_clean <- transfers_2022 %>%
-  filter(!fee %in% c("Free", "Loan", "", NA)) %>%
-  mutate(fee = str_remove_all(fee, "€|m|\\s"),
-         fee = as.numeric(fee))  # en millions d’euros
-
-# Calcul des investissements totaux par club d’arrivée
-investissements <- transfers_clean %>%
-  group_by(club_to) %>%
-  summarise(invest_total = sum(fee, na.rm = TRUE))
-
-# Préparer la table avec variation de points (déjà calculée ailleurs)
-variation_points <- team_stats_2022_2023 %>%
-  select(Squad, Pts) %>%
-  rename(club_to = Squad, Pts_22_23 = Pts) %>%
-  left_join(select(team_stats_2021_2022, Squad, Pts), by = c("club_to" = "Squad")) %>%
-  rename(Pts_21_22 = Pts) %>%
-  mutate(variation_pts = Pts_22_23 - Pts_21_22)
-
-# Fusion des données
-df_invest <- left_join(variation_points, investissements, by = "club_to") %>%
-  filter(!is.na(invest_total))
-
-# Scatter plot
-ggplot(df_invest, aes(x = invest_total, y = variation_pts)) +
-  geom_point(size = 3, alpha = 0.7, color = "#E69F00") +
-  geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "dashed") +
-  labs(
-    title = "Lien entre investissement estival et progression en points",
-    x = "Montant investi (en millions €)",
-    y = "Évolution du nombre de points"
-  ) +
-  theme_minimal()
 
 ```
 
