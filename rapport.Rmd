@@ -170,9 +170,11 @@ Nous supposons que les clubs ayant terminé en bas de classement ou nouvellement
 
 ```{r message=FALSE}
 # Code
+#pr bien lire les accent on met en UTF
+transfers_2022_q1 <- read.csv("data/2022_2023_football_summer_transfers.csv", sep = ",", fileEncoding = "UTF-8")
 
 # Nettoyage de base
-transfers_clean <- transfers_2022 %>%
+transfers_clean <- transfers_2022_q1 %>%
   filter(!is.na(club_to), !is.na(position), position != "")
 
 # Regrouper et compter
@@ -431,8 +433,11 @@ Les attaquants et les jeunes espoirs prometteurs devraient constituer la majorit
 
 
 ```{r}
+
+transfers_2022_q5 <- read.csv("data/2022_2023_football_summer_transfers.csv", sep = ",", fileEncoding = "UTF-8")
+
 # Nettoyage des montants
-transferts_top <- transfers_2022 %>%
+transferts_top <- transfers_2022_q5 %>%
   filter(!is.na(fee)) %>%
   mutate(fee_num = str_extract(fee, "[0-9,.]+"),
          fee_num = as.numeric(gsub(",", ".", fee_num))) %>%
@@ -440,6 +445,7 @@ transferts_top <- transfers_2022 %>%
   arrange(desc(fee_num)) %>%
   distinct(name, .keep_all = TRUE) %>%
   slice_max(fee_num, n = 15)
+
 
 # Graphique
 ggplot(transferts_top, aes(x = reorder(name, fee_num), y = fee_num)) +
