@@ -645,24 +645,96 @@ ggplot(transfers_local_vs_intl, aes(x = reorder(country_to, -nb_transferts), y =
 
 #### 🎯 Objectif:
 
+Identifier les clubs qui intègrent le plus de jeunes joueurs dans leur effectif et leur donnent du temps de jeu.
 
 #### 🧪 Hypothèse :
 
-
+Certains clubs, notamment ceux ayant une stratégie axée sur la formation ou la revente de joueurs (comme RB Salzburg, l'Ajax ou Barcelone), misent davantage sur les jeunes talents, tant en nombre qu’en minutes jouées. On peut également s’attendre à observer une forte présence de jeunes joueurs dans les clubs des championnats français et espagnol, ces pays disposant de viviers de talents particulièrement importants et n'hésite pas à former de jeunes joueurs. Par ailleurs, les clubs disposant de moyens financiers plus limités ont souvent tendance à faire davantage confiance aux jeunes joueurs, qui représentent une alternative plus économique
 
 ```{r}
 
+# Filtrer les jeunes joueurs 
+jeunes_joueurs <- player_stats_2021_2022  %>%
+  filter(Age < 22)
+
+# Compter le nombre de jeunes joueurs par club
+jeunes_par_club <- jeunes_joueurs %>%
+  count(Squad, name = "nb_jeunes") %>%
+  arrange(desc(nb_jeunes)) %>%
+  top_n(10, nb_jeunes)
+
+# Barplot horizontal
+ggplot(jeunes_par_club, aes(x = reorder(Squad, nb_jeunes), y = nb_jeunes)) +
+  geom_col(fill = "#66BB6A", width = 0.6) +  
+  geom_text(aes(label = nb_jeunes), hjust = -0.1, size = 4, color = "black") +
+  coord_flip(clip = "off") +
+  labs(
+    title = "Top 10 des clubs avec le plus de jeunes joueurs (< 22 ans)\nSaison 2021/22",
+    x = NULL,
+    y = "Nombre de jeunes joueurs"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    axis.text.y = element_text(face = "bold"),
+    axis.text.x = element_text(color = "gray30"),
+    panel.grid.major.y = element_blank(),  
+    panel.grid.minor = element_blank(),
+    plot.margin = margin(10, 20, 10, 10) 
+  ) +
+  ylim(0, max(jeunes_par_club$nb_jeunes) + 2)  
+
+```
+```{r}
+# Filtrer les jeunes joueurs (<23 ans)
+jeunes_joueurs <- player_stats_2021_2022 %>%
+  filter(Age < 23)
+
+# Calculer le total des minutes jouées par club (par les jeunes joueurs)
+minutes_par_club <- jeunes_joueurs %>%
+  group_by(Squad) %>%
+  summarise(total_minutes = sum(Min, na.rm = TRUE)) %>%
+  arrange(desc(total_minutes)) %>%
+  slice_head(n = 10)  # Top 10 clubs
+
+# Lollipop plot
+ggplot(minutes_par_club, aes(x = reorder(Squad, total_minutes), y = total_minutes)) +
+  geom_segment(aes(xend = Squad, y = 0, yend = total_minutes), color = "#4CAF50", size = 1.2) +
+  geom_point(color = "#FBC02D", size = 6) +
+  coord_flip() +
+  labs(
+    title = "Total des minutes jouées par les jeunes joueurs\npar club sur la saison 2021/22",
+    x = "Club",
+    y = "Minutes jouées"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    axis.text.y = element_text(face = "bold"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+
 ```
 
+#### 🧠 Interprétation des graphiques:
 
-#### 🧠 Interprétation du graphique:
+On observe que plusieurs clubs réputés pour leur politique de formation, comme le FC Barcelone, le Borussia Dortmund ou le Bayer Leverkusen, n’hésitent pas à accorder un temps de jeu conséquent à leurs jeunes joueurs. Cette tendance confirme l’importance de la jeunesse dans leur stratégie sportive, que ce soit pour renforcer l’équipe première ou pour valoriser les talents issus de leur centre de formation.
+
+Comme suggéré dans l'hypothèse initiale, le championnat français se distingue particulièrement, avec six clubs présents dans le top 15 en nombre de jeunes joueurs utilisés, et quatre clubs dans le top 10 en termes de minutes jouées. Cela illustre une culture profondément ancrée de la formation et une volonté d’intégrer rapidement les jeunes dans les effectifs professionnels. La Ligue 1 s’impose ainsi comme l’un des championnats les plus propices à l’émergence de jeunes talents.
+
+En revanche, la Liga espagnole affiche une présence plus discrète que ce que l’on aurait pu anticiper, avec seulement deux clubs dans le top 15 en nombre de jeunes joueurs, et deux également dans le top 10 en minutes jouées. Toutefois, le FC Barcelone, présent dans les deux classements, incarne une exception notable, illustrant une stratégie claire de valorisation de la formation interne. Des clubs comme Reims, Bologne ou Valence adoptent également cette approche, en combinant un effectif jeune à un temps de jeu significatif pour ces joueurs.
+
+Enfin, aucune tendance nette ne permet de lier le budget des clubs à l’utilisation des jeunes joueurs. Des formations aux ressources importantes comme le PSG, le Milan AC ou le FC Barcelone figurent parmi celles qui font le plus appel à leurs jeunes, ce qui montre qu’un centre de formation performant peut constituer un atout stratégique, indépendamment de la puissance financière du club.
 
 
 ✅ **Conclusion** :  
-
+L’hypothèse est donc globalement confirmée : les clubs avec une stratégie de formation claire jouent davantage leurs jeunes talents, comme en témoignent les chiffres en nombre de joueurs et en minutes jouées. Cependant, la diversité des situations montre que ce n’est pas uniquement une question de moyens financiers, mais surtout d’efficacité des centres de formation et de la politique sportive adoptée. Cette analyse souligne donc l’importance de la formation comme facteur clé de succès pour les clubs souhaitant valoriser leurs jeunes joueurs sur le long terme
 ---
 
-### **Question 10 :Quelles équipes sont les plus "chanceuses" ou "malchanceuses" ? **
+### **Question 10 : Quelles équipes sont les plus "chanceuses" ou "malchanceuses" ? **
 
 #### 🎯 Objectif:
 
