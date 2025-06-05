@@ -737,22 +737,84 @@ L’hypothèse est donc globalement confirmée : les clubs avec une stratégie d
 ### **Question 10 : Quelles équipes sont les plus "chanceuses" ou "malchanceuses" ? **
 
 #### 🎯 Objectif:
+Identifier les équipes dont le nombre de buts marqués est significativement supérieur ou inférieur à leur expected goals (xG) sur la saison 2021/2022. Cela permet de mettre en évidence celles qui dépassent les attentes en convertissant efficacement leurs occasions (équipes « chanceuses »), et celles qui, malgré beaucoup d’occasions créées (xG élevé), peinent à concrétiser (équipes « malchanceuses »). On ne se basera que sur les grands championnats pour essayer d'établir une corrélation avec la place dans le classement cette année la.
 
 
 #### 🧪 Hypothèse :
 
+Il paraît plausible que les équipes les mieux classées dans leur championnat ont tendance à être « chanceuses », c’est-à-dire qu’elles marquent plus de buts que ce que leur expected goals (xG) prédit, grâce à une meilleure finition et une efficacité offensive supérieure. En revanche, les équipes moins bien classées que ce qu'elle devrait, malgré un xG parfois élevé, peinent à convertir leurs occasions, ce qui les rend « malchanceuses » et reflète un manque de réalisme devant le but ou une qualité individuelle moindre.
+
 
 
 ```{r}
+# On ajoute une colonne GF - xG (buts réels moins buts attendus)
+team_stats_2021_2022$delta_goals <- team_stats_2021_2022$GF - team_stats_2021_2022$xG
+
+top_chanceuses <- team_stats_2021_2022 %>%
+  arrange(desc(delta_goals)) %>%
+  slice_head(n = 10)
+
+ggplot(top_chanceuses, aes(x = reorder(Squad, delta_goals), y = delta_goals)) +
+  geom_col(fill = "#4CAF50") +
+  coord_flip() + #inverse l'affichage
+  labs(
+    title = "Top 10 équipes 'chanceuses' en 2021/2022",
+    subtitle = "Équipes ayant marqué plus de buts que leurs xG attendus",
+    x = "Équipe",
+    y = "Différence buts réels - xG"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+    plot.subtitle = element_text(hjust = 0.5, size = 11, face = "italic"),
+    axis.title.x = element_text(face = "bold", size = 10),
+    axis.title.y = element_text(face = "bold", size = 11),
+    panel.grid.major.y = element_blank()
+  )
+
+
 
 ```
 
+```{r}
+# Top 10 équipes "malchanceuses" (delta_goals négatif le plus bas)
+top_malchanceuses <- team_stats_2021_2022 %>%
+  arrange(delta_goals) %>%
+  slice_head(n = 10)
+
+ggplot(top_malchanceuses, aes(x = reorder(Squad, delta_goals), y = delta_goals)) +
+  geom_col(fill = "#D32F2F") +
+  coord_flip() + #inverse l'affichage
+  labs(
+    title = "Top 10 équipes 'malchanceuses' en 2021/2022",
+    subtitle = "Équipes avec un xG élevé mais peu de buts marqués",
+    x = "Équipe",
+    y = "Différence buts réels - xG"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+    plot.subtitle = element_text(hjust = 0.5, size = 11, face = "italic"),
+    axis.title.x = element_text(face = "bold", size = 10),
+    axis.title.y = element_text(face = "bold", size = 11),
+    panel.grid.major.y = element_blank()
+  )
+
+
+
+
+```
 
 #### 🧠 Interprétation du graphique:
+Une corrélation semble se dessiner entre les équipes "chanceuses" (celles qui ont marqué plus de buts que leurs xG) et leur performance en championnat. Parmi elles, on retrouve Dortmund (2ᵉ de Bundesliga), la Lazio (5ᵉ de Serie A), Rennes (4ᵉ de Ligue 1), Leverkusen (3ᵉ de Bundesliga), Naples (3ᵉ de Serie A) ou encore le PSG (champion de Ligue 1). Ces équipes, à l’exception des très gros clubs comme le PSG, ont souvent réalisé l’une de leurs meilleures saisons, au regard de leur budget et de leur classement habituel. C’est également le cas d’équipes comme le Hellas Vérone (9ᵉ en Serie A cette année-là, contre 17ᵉ la saison suivante) ou Nantes (9ᵉ en Ligue 1, alors qu’ils étaient 18ᵉ la saison précédente et 17ᵉ la suivante), ce qui témoigne de saisons en surperformance.
 
+En revanche, les équipes "malchanceuses" (celles dont le xG est élevé mais qui ont peu marqué) sont, pour la plupart, des équipes bien classées : la Real Sociedad (6ᵉ de Liga), le Genoa (11ᵉ de Serie A), Lorient (10ᵉ de Ligue 1), l’Athletic Club (8ᵉ), Clermont (8ᵉ), le Rayo Vallecano (12ᵉ) ou encore Wolfsburg (12ᵉ). Cela s’explique probablement par leur capacité à se créer de nombreuses occasions, sans toujours parvenir à les convertir.
+
+À l’inverse, des clubs comme Norwich ou Alavés, bons derniers de leurs championnats respectifs, illustrent que parfois la "malchance" n’est pas en cause : il s’agit simplement de saisons ratées globalement, à tous les niveaux.
 
 ✅ **Conclusion** :  
 
+Il semble que les équipes dites "chanceuses" surperforment souvent en championnat, ce qui peut renforcer leur dynamique positive. À l’inverse, les "malchanceuses" ne sont pas toujours en échec, mais leur manque de réalisme peut freiner leur progression. Pour ces dernières, investir dans un buteur performant pourrait être une stratégie judicieuse, si les moyens financiers le permettent.
 ---
 
 ### **Question 11 : **
