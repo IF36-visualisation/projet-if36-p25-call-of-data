@@ -755,8 +755,8 @@ top_chanceuses <- team_stats_2021_2022 %>%
   slice_head(n = 10)
 
 ggplot(top_chanceuses, aes(x = reorder(Squad, delta_goals), y = delta_goals)) +
-  geom_col(fill = "#4CAF50") +
-  coord_flip() + #inverse l'affichage
+  geom_col(fill = "#4CAF50", width = 0.6) +
+  coord_flip(clip = "off") + 
   labs(
     title = "Top 10 équipes 'chanceuses' en 2021/2022",
     subtitle = "Équipes ayant marqué plus de buts que leurs xG attendus",
@@ -769,8 +769,12 @@ ggplot(top_chanceuses, aes(x = reorder(Squad, delta_goals), y = delta_goals)) +
     plot.subtitle = element_text(hjust = 0.5, size = 11, face = "italic"),
     axis.title.x = element_text(face = "bold", size = 10),
     axis.title.y = element_text(face = "bold", size = 11),
-    panel.grid.major.y = element_blank()
+    axis.text.y = element_text(face = "bold"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.margin = margin(10, 30, 10, 10)
   )
+
 
 
 
@@ -783,8 +787,8 @@ top_malchanceuses <- team_stats_2021_2022 %>%
   slice_head(n = 10)
 
 ggplot(top_malchanceuses, aes(x = reorder(Squad, delta_goals), y = delta_goals)) +
-  geom_col(fill = "#D32F2F") +
-  coord_flip() + #inverse l'affichage
+  geom_col(fill = "#D32F2F", width = 0.6) +
+  coord_flip(clip = "off") +
   labs(
     title = "Top 10 équipes 'malchanceuses' en 2021/2022",
     subtitle = "Équipes avec un xG élevé mais peu de buts marqués",
@@ -797,9 +801,11 @@ ggplot(top_malchanceuses, aes(x = reorder(Squad, delta_goals), y = delta_goals))
     plot.subtitle = element_text(hjust = 0.5, size = 11, face = "italic"),
     axis.title.x = element_text(face = "bold", size = 10),
     axis.title.y = element_text(face = "bold", size = 11),
-    panel.grid.major.y = element_blank()
+    axis.text.y = element_text(face = "bold"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.margin = margin(10, 30, 10, 10)
   )
-
 
 
 
