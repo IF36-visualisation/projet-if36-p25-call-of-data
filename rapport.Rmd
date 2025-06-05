@@ -960,25 +960,70 @@ Ce graphique met en évidence que certains clubs reposent quasiment à moitié s
 
 ---
 
-### **Question 13 :  **
+### **Question 13 : Les investissements ont-ils amélioré les résultats sportifs ? **
 
 #### 🎯 Objectif:
+Analyser s’il existe une relation entre les montants investis par les clubs pendant le mercato estival 2022 et leur évolution en termes de points entre les saisons 2021-2022 et 2022-2023.
 
 
 #### 🧪 Hypothèse :
-
+Les clubs ayant dépensé davantage lors du mercato estival 2022 ont obtenu de meilleurs résultats sportifs la saison suivante.
 
 ```{r}
+# Nettoyage de la variable "fee" (valeur du transfert)
+transfers_clean <- transfers_2022 %>%
+  filter(!fee %in% c("Free", "Loan", "", NA)) %>%
+  mutate(fee = str_remove_all(fee, "€|m|\\s"),
+         fee = as.numeric(fee))  # en millions d’euros
+
+# Calcul des investissements totaux par club d’arrivée
+investissements <- transfers_clean %>%
+  group_by(club_to) %>%
+  summarise(invest_total = sum(fee, na.rm = TRUE))
+
+# Préparer la table avec variation de points (déjà calculée ailleurs)
+variation_points <- team_stats_2022_2023 %>%
+  select(Squad, Pts) %>%
+  rename(club_to = Squad, Pts_22_23 = Pts) %>%
+  left_join(select(team_stats_2021_2022, Squad, Pts), by = c("club_to" = "Squad")) %>%
+  rename(Pts_21_22 = Pts) %>%
+  mutate(variation_pts = Pts_22_23 - Pts_21_22)
+
+# Fusion des données
+df_invest <- left_join(variation_points, investissements, by = "club_to") %>%
+  filter(!is.na(invest_total))
+
+# Scatter plot
+ggplot(df_invest, aes(x = invest_total, y = variation_pts)) +
+  geom_point(size = 3, alpha = 0.7, color = "#E69F00") +
+  geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "dashed") +
+  labs(
+    title = "Lien entre investissement estival et progression en points",
+    x = "Montant investi (en millions €)",
+    y = "Évolution du nombre de points"
+  ) +
+  theme_minimal()
 
 
 ```
 
 
 #### 🧠 Interprétation du graphique:
+Ce graphique met en relation le montant investi par chaque club lors du mercato estival 2022 et la variation de points obtenue entre les saisons 2021-2022 et 2022-2023.
 
+Chaque point représente un club :
+
+- L’axe horizontal indique le montant total investi en millions d’euros.
+- L’axe vertical indique l’évolution du nombre de points sur une saison.
+
+La droite de tendance (régression linéaire) montre une légère pente négative, ce qui signifie que plus un club a investi, moins il a eu tendance à progresser en termes de points.
 
 ✅ **Conclusion** :  
 
+Cette visualisation suggère que les investissements élevés ne se traduisent pas systématiquement par une amélioration des résultats sportifs.
+Au contraire, la tendance observée dans notre échantillon montre une corrélation légèrement négative entre les montants investis et la progression en points.
+
+Ce résultat met en évidence que le budget seul ne suffit pas : la qualité du recrutement, l’intégration des joueurs, la stratégie de jeu ou encore la stabilité de l’effectif peuvent jouer un rôle plus important que la dépense brute.
 ---
 
 ### **Question 14 :**
