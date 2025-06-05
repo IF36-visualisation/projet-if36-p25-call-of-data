@@ -1026,25 +1026,59 @@ Au contraire, la tendance observée dans notre échantillon montre une corrélat
 Ce résultat met en évidence que le budget seul ne suffit pas : la qualité du recrutement, l’intégration des joueurs, la stratégie de jeu ou encore la stabilité de l’effectif peuvent jouer un rôle plus important que la dépense brute.
 ---
 
-### **Question 14 :**
+### **Question 14 : Quels sont les meilleurs milieux de terrain en termes de création ?**
 
 #### 🎯 Objectif:
+Identifier les milieux de terrain les plus créatifs lors de la saison 2021-2022 en combinant plusieurs indicateurs : passes clés, passes décisives, passes dans la surface, et passes menant à des tirs.
+
 
 
 #### 🧪 Hypothèse :
-
+Un milieu créatif ne se limite pas aux passes décisives. Les meilleurs créateurs sont ceux qui préparent les occasions, pénètrent dans les zones dangereuses et participent activement à la construction offensive.
 
 
 ```{r}
+# Sélection des milieux ayant joué au moins 10 matchs et disponibles dans les bonnes colonnes
+milieux <- player_stats_2021_2022 %>%
+  filter(Pos %in% c("MF", "CM", "DM", "AM")) %>%
+  filter(MP >= 10) %>%
+  select(Player, Squad, Pos, MP, Assists, PasAss, PPA, ScaPassLive) %>%
+  mutate(note_creation = (Assists + PasAss + PPA + ScaPassLive) / MP) %>%
+  arrange(desc(note_creation)) %>%
+  slice_head(n = 10)
+ggplot(milieux, aes(x = reorder(Player, note_creation), y = note_creation, fill = Squad)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Top 10 des milieux les plus créatifs (2021-2022)",
+    x = "Joueur",
+    y = "Indice de création par match"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
 
 ```
 
 
 #### 🧠 Interprétation du graphique:
+L’indice utilisé ici combine 4 dimensions de la création offensive :
+
+Assists : passes menant directement à un but,
+
+PasAss : passes clés (key passes),
+
+PPA : passes vers la surface de réparation,
+
+ScaPassLive : passes en jeu menant à une action de tir.
+
+En divisant par le nombre de matchs joués, on obtient un indice normalisé, ce qui permet de comparer équitablement les joueurs.
+
 
 
 ✅ **Conclusion** :  
 
+Cette approche met en lumière les milieux les plus impliqués dans la création offensive, qu’ils soient passeurs décisifs, régulateurs du jeu ou moteurs de la progression du ballon.
+Elle montre que la créativité ne se limite pas aux passes décisives visibles, mais aussi à la construction d’occasions, essentielle au jeu moderne.
 ---
 
 ### **Question 15 : **
@@ -1057,6 +1091,7 @@ Ce résultat met en évidence que le budget seul ne suffit pas : la qualité du 
 
 
 ```{r}
+
 
 ```
 
