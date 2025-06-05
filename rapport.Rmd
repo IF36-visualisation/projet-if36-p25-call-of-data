@@ -730,8 +730,8 @@ En revanche, la Liga espagnole affiche une présence plus discrète que ce que l
 Enfin, aucune tendance nette ne permet de lier le budget des clubs à l’utilisation des jeunes joueurs. Des formations aux ressources importantes comme le PSG, le Milan AC ou le FC Barcelone figurent parmi celles qui font le plus appel à leurs jeunes, ce qui montre qu’un centre de formation performant peut constituer un atout stratégique, indépendamment de la puissance financière du club.
 
 
-✅ **Conclusion** :  
-L’hypothèse est donc globalement confirmée : les clubs avec une stratégie de formation claire jouent davantage leurs jeunes talents, comme en témoignent les chiffres en nombre de joueurs et en minutes jouées. Cependant, la diversité des situations montre que ce n’est pas uniquement une question de moyens financiers, mais surtout d’efficacité des centres de formation et de la politique sportive adoptée. Cette analyse souligne donc l’importance de la formation comme facteur clé de succès pour les clubs souhaitant valoriser leurs jeunes joueurs sur le long terme
+✅ **Conclusion** :L’hypothèse est donc globalement confirmée : les clubs avec une stratégie de formation claire jouent davantage leurs jeunes talents, comme en témoignent les chiffres en nombre de joueurs et en minutes jouées. Cependant, la diversité des situations montre que ce n’est pas uniquement une question de moyens financiers, mais surtout d’efficacité des centres de formation et de la politique sportive adoptée. Cette analyse souligne donc l’importance de la formation comme facteur clé de succès pour les clubs souhaitant valoriser leurs jeunes joueurs sur le long terme
+
 ---
 
 ### **Question 10 : Quelles équipes sont les plus "chanceuses" ou "malchanceuses" ? **
@@ -818,9 +818,8 @@ En revanche, les équipes "malchanceuses" (celles dont le xG est élevé mais qu
 
 À l’inverse, des clubs comme Norwich ou Alavés, bons derniers de leurs championnats respectifs, illustrent que parfois la "malchance" n’est pas en cause : il s’agit simplement de saisons ratées globalement, à tous les niveaux.
 
-✅ **Conclusion** :  
+✅ **Conclusion** :Il semble que les équipes dites "chanceuses" surperforment souvent en championnat, ce qui peut renforcer leur dynamique positive. À l’inverse, les "malchanceuses" ne sont pas toujours en échec, mais leur manque de réalisme peut freiner leur progression. Pour ces dernières, investir dans un buteur performant pourrait être une stratégie judicieuse, si les moyens financiers le permettent.
 
-Il semble que les équipes dites "chanceuses" surperforment souvent en championnat, ce qui peut renforcer leur dynamique positive. À l’inverse, les "malchanceuses" ne sont pas toujours en échec, mais leur manque de réalisme peut freiner leur progression. Pour ces dernières, investir dans un buteur performant pourrait être une stratégie judicieuse, si les moyens financiers le permettent.
 ---
 
 ### **Question 11 : **
