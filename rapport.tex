@@ -119,7 +119,7 @@
 \title{Rapport}
 \author{Ahamad MOHAMMAD; Minko Bikono NEIL-JOVY; Simon GELBART; Willen
 AMICHE}
-\date{2025-04-25}
+\date{2025-04-27}
 
 \begin{document}
 \maketitle
@@ -268,47 +268,6 @@ questions}}{Analyse et réponses aux questions}}\label{analyse-et-ruxe9ponses-au
 \CommentTok{\# Chargement des packages nécessaires}
 
 \FunctionTok{library}\NormalTok{(tidyverse)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## Warning: le package 'tidyverse' a été compilé avec la version R 4.3.3
-\end{verbatim}
-
-\begin{verbatim}
-## Warning: le package 'ggplot2' a été compilé avec la version R 4.3.3
-\end{verbatim}
-
-\begin{verbatim}
-## Warning: le package 'tibble' a été compilé avec la version R 4.3.3
-\end{verbatim}
-
-\begin{verbatim}
-## Warning: le package 'tidyr' a été compilé avec la version R 4.3.3
-\end{verbatim}
-
-\begin{verbatim}
-## Warning: le package 'readr' a été compilé avec la version R 4.3.3
-\end{verbatim}
-
-\begin{verbatim}
-## Warning: le package 'purrr' a été compilé avec la version R 4.3.3
-\end{verbatim}
-
-\begin{verbatim}
-## Warning: le package 'dplyr' a été compilé avec la version R 4.3.3
-\end{verbatim}
-
-\begin{verbatim}
-## Warning: le package 'forcats' a été compilé avec la version R 4.3.3
-\end{verbatim}
-
-\begin{verbatim}
-## Warning: le package 'lubridate' a été compilé avec la version R 4.3.3
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(ggplot2)}
 \end{Highlighting}
 \end{Shaded}
@@ -429,79 +388,346 @@ les plus valorisés sur le marché
 Visualiser la valeur marchande des joueurs par poste pour comprendre
 quels types de profils sont les plus prisés financièrement sur le
 marché. Cela permet de hiérarchiser les postes selon leur importance
-économique dans le football professionnel.
+économique dans le football professionnel. Pour ça, on se base sur le
+mercato qui a eu lieu durant l'été 2022.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# Nettoyage de base}
+\CommentTok{\# Nettoyage des données}
 \NormalTok{transfers\_clean }\OtherTok{\textless{}{-}}\NormalTok{ transfers\_2022 }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(position), }\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(market\_value))}
+  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(position), }\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(market\_value)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{distinct}\NormalTok{(name, position, age, }\AttributeTok{.keep\_all =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{market\_value\_num =} \FunctionTok{as.numeric}\NormalTok{(market\_value)  }\CommentTok{\# Convertir les valeurs en numérique}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(market\_value\_num }\SpecialCharTok{\textgreater{}=} \FloatTok{1.5}\NormalTok{)  }\CommentTok{\# Filtrer les valeurs négatives/nulles ou pas réalistes genre en dessous de 1.5 millions}
+\end{Highlighting}
+\end{Shaded}
 
-\CommentTok{\# Visualisation avec boxplot}
-\FunctionTok{ggplot}\NormalTok{(transfers\_clean, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{reorder}\NormalTok{(position, market\_value, }\AttributeTok{FUN =}\NormalTok{ median), }\AttributeTok{y =}\NormalTok{ market\_value)) }\SpecialCharTok{+}
-  \FunctionTok{geom\_boxplot}\NormalTok{(}\AttributeTok{fill =} \StringTok{"\#FFB347"}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{, }\AttributeTok{outlier.color =} \StringTok{"red"}\NormalTok{, }\AttributeTok{outlier.size =} \DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{coord\_flip}\NormalTok{() }\SpecialCharTok{+}
+\begin{verbatim}
+## Warning: There was 1 warning in `mutate()`.
+## i In argument: `market_value_num = as.numeric(market_value)`.
+## Caused by warning:
+## ! NAs introduits lors de la conversion automatique
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# On crée une colonne pour regrouper certains postes qui sont très proches}
+\NormalTok{transfers\_clean }\OtherTok{\textless{}{-}}\NormalTok{ transfers\_clean }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{position\_fr =}\NormalTok{ position) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{position\_fr =} \FunctionTok{recode}\NormalTok{(position\_fr,}
+                              \StringTok{"Second Striker"} \OtherTok{=} \StringTok{"Attaquant"}\NormalTok{,}
+                              \StringTok{"Centre{-}Forward"} \OtherTok{=} \StringTok{"Attaquant"}\NormalTok{,}
+                              \StringTok{"Forward Attacker"} \OtherTok{=} \StringTok{"Attaquant"}\NormalTok{,}
+                              \StringTok{"attack"} \OtherTok{=} \StringTok{"Attaquant"}\NormalTok{,}
+                              \StringTok{"Right Midfield"} \OtherTok{=} \StringTok{"Ailier droit"}\NormalTok{,}
+                              \StringTok{"Left Midfield"} \OtherTok{=} \StringTok{"Ailier gauche"}\NormalTok{,}
+                              \StringTok{"Attacking Midfield"} \OtherTok{=} \StringTok{"Milieu offensif"}\NormalTok{,}
+                              \StringTok{"Central Midfield"} \OtherTok{=} \StringTok{"Milieu central"}\NormalTok{,}
+                              \StringTok{"Defensive Midfield"} \OtherTok{=} \StringTok{"Milieu central"}\NormalTok{, }
+                              \StringTok{"Centre{-}Back"} \OtherTok{=} \StringTok{"Défenseur central"}\NormalTok{,}
+                              \StringTok{"defence"} \OtherTok{=} \StringTok{"Défenseur central"}\NormalTok{,}
+                              \StringTok{"Right Winger"} \OtherTok{=} \StringTok{"Ailier droit"}\NormalTok{,}
+                              \StringTok{"Left Winger"} \OtherTok{=} \StringTok{"Ailier gauche"}\NormalTok{, }
+                              \StringTok{"Left{-}Back"} \OtherTok{=} \StringTok{"Défenseur gauche"}\NormalTok{,}
+                              \StringTok{"Right{-}Back"} \OtherTok{=} \StringTok{"Défenseur droit"}\NormalTok{,}
+                              \StringTok{"Goalkeeper"} \OtherTok{=} \StringTok{"Gardien de but"}\NormalTok{,}
+                              \AttributeTok{.default =}\NormalTok{ position\_fr))  }\CommentTok{\# Par défaut, on garde la position d\textquotesingle{}origine}
+
+\CommentTok{\# Calcul de la moyenne et de l\textquotesingle{}écart{-}type des valeurs marchandes par poste}
+\NormalTok{transfers\_clean\_stats }\OtherTok{\textless{}{-}}\NormalTok{ transfers\_clean }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(position\_fr) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(}\FunctionTok{n}\NormalTok{() }\SpecialCharTok{\textgreater{}=} \DecValTok{5}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}  
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{mean\_value =} \FunctionTok{mean}\NormalTok{(market\_value\_num, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
+    \AttributeTok{sd\_value =} \FunctionTok{sd}\NormalTok{(market\_value\_num, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  )}
+
+\CommentTok{\# Visualisation avec un barplot et des barres d\textquotesingle{}erreur pour voir les postes qui ont une grosse différence de prix}
+\FunctionTok{ggplot}\NormalTok{(transfers\_clean\_stats, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{reorder}\NormalTok{(position\_fr, mean\_value), }\AttributeTok{y =}\NormalTok{ mean\_value)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat =} \StringTok{"identity"}\NormalTok{, }\AttributeTok{fill =} \StringTok{"\#4CAF50"}\NormalTok{) }\SpecialCharTok{+}  
+  \FunctionTok{geom\_errorbar}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{ymin =} \FunctionTok{pmax}\NormalTok{(mean\_value }\SpecialCharTok{{-}}\NormalTok{ sd\_value, }\DecValTok{0}\NormalTok{), }\AttributeTok{ymax =}\NormalTok{ mean\_value }\SpecialCharTok{+}\NormalTok{ sd\_value), }\AttributeTok{width =} \FloatTok{0.2}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}
-    \AttributeTok{title =} \StringTok{"Valeur marchande des joueurs par poste (été 2022)"}\NormalTok{,}
+    \AttributeTok{title =} \StringTok{"Valeur marchande moyenne par poste (mercato été 2022)"}\NormalTok{,}
     \AttributeTok{x =} \StringTok{"Poste"}\NormalTok{,}
-    \AttributeTok{y =} \StringTok{"Valeur marchande (€)"}
+    \AttributeTok{y =} \StringTok{"Valeur marchande moyenne (Millions d\textquotesingle{}€)"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_size =} \DecValTok{12}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{coord\_flip}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{rapport_files/figure-latex/unnamed-chunk-2-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{transfers\_clean }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{count}\NormalTok{(position\_fr, }\AttributeTok{sort =} \ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##         position_fr   n
+## 1    Milieu central 271
+## 2         Attaquant 245
+## 3 Défenseur central 203
+## 4     Ailier gauche 121
+## 5      Ailier droit  96
+## 6   Milieu offensif  95
+## 7  Défenseur gauche  82
+## 8   Défenseur droit  76
+## 9    Gardien de but  63
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{print}\NormalTok{(transfers\_clean }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{count}\NormalTok{(position\_fr, }\AttributeTok{sort =} \ConstantTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##         position_fr   n
+## 1    Milieu central 271
+## 2         Attaquant 245
+## 3 Défenseur central 203
+## 4     Ailier gauche 121
+## 5      Ailier droit  96
+## 6   Milieu offensif  95
+## 7  Défenseur gauche  82
+## 8   Défenseur droit  76
+## 9    Gardien de but  63
+\end{verbatim}
+
+\paragraph{🧠 Interprétation du
+graphique:}\label{interpruxe9tation-du-graphique-1}
+
+Attaquant et Buteur : Les attaquants sont les joueurs les plus valorisés
+sur le marché, avec une valeur moyenne qui dépasse largement celle des
+autres postes. Cela reflète l'importance des joueurs offensifs dans le
+football moderne, où les buts et les performances offensives sont
+souvent décisives mais surtout les attaquants sont souvent les joueurs
+qui attirent le plus l'attention des fans et des médias, ce qui en fait
+des atouts marketing précieux pour les clubs et qui explique leur valeur
+bien plus élevé
+
+Défenseur central : Les défenseurs centraux occupent la deuxième place
+en termes de valeur marchande. Leur rôle crucial dans la stabilité
+défensive et leur capacité à organiser la défense expliquent cette
+valorisation élevée. Un bon défenseur central peut être la clé de voûte
+d'une équipe solide et équilibrée.
+
+Ailier droit et Ailier gauche : Les ailiers, qu'ils soient droits ou
+gauches, présentent une valeur marchande significative sur le marché des
+transferts avec respectivement la 3ème et 5ème place. Toutefois, on
+observe souvent une légère survalorisation des ailiers droits. Cette
+différence peut s'expliquer par la rareté relative des ailiers droits
+car cela implique souvent d'être gaucher, pour être capables de repiquer
+dans l'axe et de frapper avec leur pied fort. Ce profil est très
+recherché dans le football moderne d'où une valorisation plus élevée.
+
+Milieu central et offensif : Les milieux centraux, souvent considérés
+comme les ``poumons'' de l'équipe, sont également très valorisés. Leur
+polyvalence et leur capacité à influencer le jeu dans les deux sens en
+font des acteurs clés sur le marché. Paradoxalement, les milieux
+offensifs semblent être moins bien valorisés. C'est un poste qui, dans
+le football moderne, a perdu de sa splendeur par rapport à avant et
+c'est caractérisé par une baisse de la valeur marchande à ce poste.
+
+Défenseur gauche et Défenseur droit : Les défenseurs latéraux, bien que
+moins valorisés que les défenseurs centraux, restent importants.Ils sont
+très recherchés dans le football moderne car ils doivent être
+polyvalents, capables de défendre et d'attaquer efficacement.On ne
+retrouve pas la rareté des latéraux droit par rapport au gauche comme on
+peut avoir avec les ailiers et on remarque qu'à l'inverse les latéraux
+gauche on tendance à avoir une plus grosse valeur marchande.
+
+Gardien de but : Les gardiens de but sont nettement moins valorisés que
+les autres postes. Cela s'explique en partie par la spécificité de ce
+rôle, qui diffère fortement des autres positions sur le terrain. Par
+extension, c'est aussi le poste le moins ``vendeur'' du football, ce qui
+se reflète dans leur valeur marchande.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{\texorpdfstring{\textbf{Question 3:} Corrélation entre xG
+et points
+?}{Question 3: Corrélation entre xG et points ?}}\label{question-3-corruxe9lation-entre-xg-et-points}
+
+\paragraph{🎯 Objectif:}\label{objectif-2}
+
+Analyser si le nombre d'expected goals (xG) réalisés par une équipe est
+corrélé avec son total de points en championnat. Cela permet de vérifier
+si produire beaucoup d'occasions (même sans forcément marquer) est un
+bon indicateur de performance globale. On utilise les données de la
+saison 2022-2023.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# On utilise les données de la saison 2022{-}2023}
+\NormalTok{team\_stats\_22\_23 }\OtherTok{\textless{}{-}}\NormalTok{ team\_stats\_2022\_2023 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(Squad, xG, Pts)}
+
+\CommentTok{\# Nettoyage basique : on supprime les NA au cas où}
+\NormalTok{team\_stats\_22\_23 }\OtherTok{\textless{}{-}}\NormalTok{ team\_stats\_22\_23 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(xG), }\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(Pts))}
+
+\CommentTok{\# Visualisation scatter plot}
+\FunctionTok{ggplot}\NormalTok{(team\_stats\_22\_23, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ xG, }\AttributeTok{y =}\NormalTok{ Pts)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{color =} \StringTok{"\#1f77b4"}\NormalTok{, }\AttributeTok{size =} \DecValTok{3}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{color =} \StringTok{"red"}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title =} \StringTok{"Corrélation entre Expected Goals (xG) et Points en championnat (2022{-}23)"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Expected Goals (xG)"}\NormalTok{,}
+    \AttributeTok{y =} \StringTok{"Points"}\NormalTok{,}
+    \AttributeTok{caption =} \StringTok{"Source : 2022{-}2023 Football Team Stats.csv"}
 \NormalTok{  ) }\SpecialCharTok{+}
   \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_size =} \DecValTok{12}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## Warning in mean.default(sort(x, partial = half + 0L:1L)[half + 0L:1L]):
-## l'argument n'est ni numérique, ni logique : renvoi de NA
-
-## Warning in mean.default(sort(x, partial = half + 0L:1L)[half + 0L:1L]):
-## l'argument n'est ni numérique, ni logique : renvoi de NA
-
-## Warning in mean.default(sort(x, partial = half + 0L:1L)[half + 0L:1L]):
-## l'argument n'est ni numérique, ni logique : renvoi de NA
-
-## Warning in mean.default(sort(x, partial = half + 0L:1L)[half + 0L:1L]):
-## l'argument n'est ni numérique, ni logique : renvoi de NA
-
-## Warning in mean.default(sort(x, partial = half + 0L:1L)[half + 0L:1L]):
-## l'argument n'est ni numérique, ni logique : renvoi de NA
+## `geom_smooth()` using formula = 'y ~ x'
 \end{verbatim}
 
-\includegraphics{rapport_files/figure-latex/unnamed-chunk-2-1.pdf}
-
-\paragraph{🧠 Interprétation du
-graphique:}\label{interpruxe9tation-du-graphique-1}
-
-\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
-
-\subsubsection{\texorpdfstring{\textbf{Question
-3:}}{Question 3:}}\label{question-3}
-
-\paragraph{🎯 Objectif:}\label{objectif-2}
+\includegraphics{rapport_files/figure-latex/unnamed-chunk-3-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# Code}
+\CommentTok{\# Calcul du coefficient de corrélation de Pearson}
+\NormalTok{cor\_xg\_pts }\OtherTok{\textless{}{-}} \FunctionTok{cor}\NormalTok{(team\_stats\_22\_23}\SpecialCharTok{$}\NormalTok{xG, team\_stats\_22\_23}\SpecialCharTok{$}\NormalTok{Pts, }\AttributeTok{use =} \StringTok{"complete.obs"}\NormalTok{)}
+\FunctionTok{paste0}\NormalTok{(}\StringTok{"Coefficient de corrélation de Pearson : "}\NormalTok{, }\FunctionTok{round}\NormalTok{(cor\_xg\_pts, }\DecValTok{3}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## [1] "Coefficient de corrélation de Pearson : 0.815"
+\end{verbatim}
 
 \paragraph{🧠 Interprétation du
 graphique:}\label{interpruxe9tation-du-graphique-2}
 
+Le graphique montre qu'il existe une forte corrélation positive entre
+les expected goals (xG) et les points obtenus en championnat lors de la
+saison 2022-2023. Le coefficient de corrélation de Pearson est de 0,815,
+ce qui indique qu'en général, plus une équipe génère d'occasions de but
+de qualité (mesurées par les xG), plus elle obtient de points au
+classement. Cela confirme que produire beaucoup d'occasions est un
+élément important pour réussir sur toute une saison.
+
+Cependant, la relation n'est pas parfaite. On observe que certains
+points sont assez éloignés de la tendance générale. Cela peut
+s'expliquer par plusieurs facteurs, comme l'efficacité offensive,
+c'est-à-dire la capacité à transformer les occasions en buts, ou encore
+la solidité défensive. Une équipe peut créer beaucoup d'occasions mais
+manquer de réalisme ou encaisser trop de buts, ce qui limite son total
+de points.
+
+En résumé, les expected goals sont un bon indicateur des performances
+d'une équipe, mais ils ne suffisent pas à eux seuls pour expliquer
+complètement les résultats. D'autres aspects du jeu, comme la finition
+ou la défense, restent essentiels.
+
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-\subsubsection{\texorpdfstring{\textbf{Question
-4:}}{Question 4:}}\label{question-4}
+\subsubsection{\texorpdfstring{\textbf{Question 4:} Quel est l'impact
+des transferts sur la performance des clubs entre 2021-2022 et 2022-2023
+?}{Question 4: Quel est l'impact des transferts sur la performance des clubs entre 2021-2022 et 2022-2023 ?}}\label{question-4-quel-est-limpact-des-transferts-sur-la-performance-des-clubs-entre-2021-2022-et-2022-2023}
 
 \paragraph{🎯 Objectif:}\label{objectif-3}
 
+Analyser l'évolution de la performance des clubs entre deux saisons
+(2021-2022 ➔ 2022-2023) en fonction de leur nombre de recrues durant
+l'été 2022.
+
+L'objectif est de voir s'il existe une corrélation entre l'activité sur
+le marché des transferts (quantité de recrutements) et l'évolution du
+classement d'une saison sur l'autre.
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# Code}
+\CommentTok{\# Regrouper les clubs qui ont recruté et compter}
+\NormalTok{nb\_recrues\_club }\OtherTok{\textless{}{-}}\NormalTok{ transfers\_clean }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(club\_to) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{nb\_recrues =} \FunctionTok{n}\NormalTok{(), }\AttributeTok{.groups =} \StringTok{"drop"}\NormalTok{)}
+
+\CommentTok{\# Préparer les classements par saison}
+\NormalTok{classements\_2021\_2022 }\OtherTok{\textless{}{-}}\NormalTok{ team\_stats\_2021\_2022 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(Squad, LgRk) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rename}\NormalTok{(}\AttributeTok{club =}\NormalTok{ Squad, }\AttributeTok{classement\_2022 =}\NormalTok{ LgRk)}
+
+\NormalTok{classements\_2022\_2023 }\OtherTok{\textless{}{-}}\NormalTok{ team\_stats\_2022\_2023 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(Squad, LgRk) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rename}\NormalTok{(}\AttributeTok{club =}\NormalTok{ Squad, }\AttributeTok{classement\_2023 =}\NormalTok{ LgRk)}
+
+\CommentTok{\# Fusionner tout ensemble}
+\NormalTok{evolution\_clubs }\OtherTok{\textless{}{-}}\NormalTok{ classements\_2021\_2022 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{inner\_join}\NormalTok{(classements\_2022\_2023, }\AttributeTok{by =} \StringTok{"club"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{left\_join}\NormalTok{(nb\_recrues\_club, }\AttributeTok{by =} \FunctionTok{c}\NormalTok{(}\StringTok{"club"} \OtherTok{=} \StringTok{"club\_to"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{nb\_recrues =} \FunctionTok{replace\_na}\NormalTok{(nb\_recrues, }\DecValTok{0}\NormalTok{),  }\CommentTok{\# certains clubs peuvent avoir 0 recrutement}
+    \AttributeTok{evolution\_classement =}\NormalTok{ classement\_2022 }\SpecialCharTok{{-}}\NormalTok{ classement\_2023}
+\NormalTok{  )}
+
+\CommentTok{\# Pour la visualisation, créer des classes selon nombre de recrues}
+\NormalTok{evolution\_clubs }\OtherTok{\textless{}{-}}\NormalTok{ evolution\_clubs }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{categorie\_recrutement =} \FunctionTok{case\_when}\NormalTok{(}
+\NormalTok{      nb\_recrues }\SpecialCharTok{==} \DecValTok{0} \SpecialCharTok{\textasciitilde{}} \StringTok{"0 recrue"}\NormalTok{,}
+\NormalTok{      nb\_recrues }\SpecialCharTok{\textless{}=} \DecValTok{3} \SpecialCharTok{\textasciitilde{}} \StringTok{"1{-}3 recrues"}\NormalTok{,}
+\NormalTok{      nb\_recrues }\SpecialCharTok{\textless{}=} \DecValTok{6} \SpecialCharTok{\textasciitilde{}} \StringTok{"4{-}6 recrues"}\NormalTok{,}
+      \ConstantTok{TRUE} \SpecialCharTok{\textasciitilde{}} \StringTok{"7+ recrues"}
+\NormalTok{    )}
+\NormalTok{  )}
+
+\CommentTok{\# Visualisation : boxplot pour voir la distribution de l\textquotesingle{}évolution du classement par catégorie de recrutement}
+\FunctionTok{ggplot}\NormalTok{(evolution\_clubs, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ categorie\_recrutement, }\AttributeTok{y =}\NormalTok{ evolution\_classement, }\AttributeTok{fill =}\NormalTok{ categorie\_recrutement)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_boxplot}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.7}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"lightblue"}\NormalTok{, }\StringTok{"skyblue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"darkblue"}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =} \DecValTok{0}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{, }\AttributeTok{color =} \StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title =} \StringTok{"Impact du recrutement sur l\textquotesingle{}évolution du classement (2021{-}2023)"}\NormalTok{,}
+    \AttributeTok{subtitle =} \StringTok{"Distribution de l\textquotesingle{}évolution de position en fonction du nombre de recrues estivales"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Nombre de recrues (catégories)"}\NormalTok{,}
+    \AttributeTok{y =} \StringTok{"Evolution du classement (positif = amélioration)"}\NormalTok{,}
+    \AttributeTok{fill =} \StringTok{"Recrutements"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_size =} \DecValTok{12}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
+\includegraphics{rapport_files/figure-latex/unnamed-chunk-4-1.pdf}
+
 \paragraph{🧠 Interprétation du
 graphique:}\label{interpruxe9tation-du-graphique-3}
+
+Le graphique montre la relation entre le nombre de joueurs recrutés par
+un club durant l'été 2022 et l'évolution de son classement entre les
+saisons 2021-2022 et 2022-2023. L'évolution du classement est calculée
+en faisant le classement de la saison 2022 moins celui de la saison
+2023. Un résultat positif signifie que le club s'est amélioré (il est
+monté dans le classement), tandis qu'un résultat négatif indique une
+baisse de performance.
+
+Globalement dans ce graphique, on observe que :
+
+Les clubs qui n'ont recruté aucun joueur ont eu des résultats très
+variables,ils affichent une médiane proche de zéro, donc peu d'impact.
+
+Les clubs qui ont recruté entre 1 et 3 joueurs ont plutôt vu leur
+classement se dégrader (médiane en dessous de 0).
+
+Les clubs ayant fait 4 à 6 recrues s'en sortent plutôt bien, avec une
+petite amélioration en moyenne et une médiane légérement supérieure à 0.
+
+Enfin, pour les clubs ayant recruté 7 joueurs ou plus, les résultats
+sont vraiment très variés : certains ont beaucoup progressé, d'autres
+ont fortement régressé. La médiane est plutôt négative, ce qui montre
+que recruter en masse ne garantit pas une amélioration du classement.
+
+En résumé, le graphique montre qu'il n'existe pas de lien clair entre le
+nombre de recrues et une amélioration du classement. Recruter beaucoup
+n'est pas toujours efficace, et une stratégie plus ciblée (recruter
+moins mais mieux) pourrait être plus rentable pour progresser.
 
 \end{document}
