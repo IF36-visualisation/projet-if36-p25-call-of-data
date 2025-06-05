@@ -691,6 +691,7 @@ ggplot(jeunes_par_club, aes(x = reorder(Squad, nb_jeunes), y = nb_jeunes)) +
   ylim(0, max(jeunes_par_club$nb_jeunes) + 2)  
 
 ```
+
 ```{r}
 # Filtrer les jeunes joueurs (<23 ans)
 jeunes_joueurs <- player_stats_2021_2022 %>%
@@ -727,13 +728,17 @@ ggplot(minutes_par_club, aes(x = reorder(Squad, total_minutes), y = total_minute
 
 #### 🧠 Interprétation des graphiques:
 
-On observe que plusieurs clubs réputés pour leur politique de formation, comme le FC Barcelone, le Borussia Dortmund ou le Bayer Leverkusen, n’hésitent pas à accorder un temps de jeu conséquent à leurs jeunes joueurs. Cette tendance confirme l’importance de la jeunesse dans leur stratégie sportive, que ce soit pour renforcer l’équipe première ou pour valoriser les talents issus de leur centre de formation.
 
-Comme suggéré dans l'hypothèse initiale, le championnat français se distingue particulièrement, avec six clubs présents dans le top 15 en nombre de jeunes joueurs utilisés, et quatre clubs dans le top 10 en termes de minutes jouées. Cela illustre une culture profondément ancrée de la formation et une volonté d’intégrer rapidement les jeunes dans les effectifs professionnels. La Ligue 1 s’impose ainsi comme l’un des championnats les plus propices à l’émergence de jeunes talents.
+- 🔵 Certains clubs réputés pour leur formation — **FC Barcelone**, **Borussia Dortmund**, **Bayer Leverkusen** — offrent un temps de jeu conséquent à leurs jeunes joueurs.
 
-En revanche, la Liga espagnole affiche une présence plus discrète que ce que l’on aurait pu anticiper, avec seulement deux clubs dans le top 15 en nombre de jeunes joueurs, et deux également dans le top 10 en minutes jouées. Toutefois, le FC Barcelone, présent dans les deux classements, incarne une exception notable, illustrant une stratégie claire de valorisation de la formation interne. Des clubs comme Reims, Bologne ou Valence adoptent également cette approche, en combinant un effectif jeune à un temps de jeu significatif pour ces joueurs.
+- 🔵 La **Ligue 1** se distingue nettement : **6 clubs dans le top 15** en nombre de jeunes joueurs utilisés, **4 dans le top 10** en minutes jouées. Cela confirme une forte culture de formation et une intégration rapide des jeunes dans les effectifs.
 
-Enfin, aucune tendance nette ne permet de lier le budget des clubs à l’utilisation des jeunes joueurs. Des formations aux ressources importantes comme le PSG, le Milan AC ou le FC Barcelone figurent parmi celles qui font le plus appel à leurs jeunes, ce qui montre qu’un centre de formation performant peut constituer un atout stratégique, indépendamment de la puissance financière du club.
+- 🔵 La **Liga espagnole** est moins représentée que prévu, avec seulement deux clubs dans le top 15. Le **FC Barcelone** reste une exception forte, incarnant une politique claire de valorisation interne.
+
+- 🔵 Certains clubs comme **Reims**, **Bologne** ou **Valence** allient jeunesse de l’effectif et temps de jeu élevé pour ces joueurs, confirmant une stratégie de développement assumée.
+
+- 🔵 Aucun lien direct n’émerge entre le **budget** et l’**utilisation des jeunes** : même les clubs les plus riches (**PSG**, **Milan AC**, **Barça**) misent fortement sur leur centre de formation. Cela montre que la formation est un levier stratégique, au-delà des moyens financiers.
+
 
 
 ✅ **Conclusion** :L’hypothèse est donc globalement confirmée : les clubs avec une stratégie de formation claire jouent davantage leurs jeunes talents, comme en témoignent les chiffres en nombre de joueurs et en minutes jouées. Cependant, la diversité des situations montre que ce n’est pas uniquement une question de moyens financiers, mais surtout d’efficacité des centres de formation et de la politique sportive adoptée. Cette analyse souligne donc l’importance de la formation comme facteur clé de succès pour les clubs souhaitant valoriser leurs jeunes joueurs sur le long terme
@@ -818,13 +823,16 @@ ggplot(top_malchanceuses, aes(x = reorder(Squad, delta_goals), y = delta_goals))
 ```
 
 #### 🧠 Interprétation du graphique:
-Une corrélation semble se dessiner entre les équipes "chanceuses" (celles qui ont marqué plus de buts que leurs xG) et leur performance en championnat. Parmi elles, on retrouve Dortmund (2ᵉ de Bundesliga), la Lazio (5ᵉ de Serie A), Rennes (4ᵉ de Ligue 1), Leverkusen (3ᵉ de Bundesliga), Naples (3ᵉ de Serie A) ou encore le PSG (champion de Ligue 1). Ces équipes, à l’exception des très gros clubs comme le PSG, ont souvent réalisé l’une de leurs meilleures saisons, au regard de leur budget et de leur classement habituel. C’est également le cas d’équipes comme le Hellas Vérone (9ᵉ en Serie A cette année-là, contre 17ᵉ la saison suivante) ou Nantes (9ᵉ en Ligue 1, alors qu’ils étaient 18ᵉ la saison précédente et 17ᵉ la suivante), ce qui témoigne de saisons en surperformance.
 
-En revanche, les équipes "malchanceuses" (celles dont le xG est élevé mais qui ont peu marqué) sont, pour la plupart, des équipes bien classées : la Real Sociedad (6ᵉ de Liga), le Genoa (11ᵉ de Serie A), Lorient (10ᵉ de Ligue 1), l’Athletic Club (8ᵉ), Clermont (8ᵉ), le Rayo Vallecano (12ᵉ) ou encore Wolfsburg (12ᵉ). Cela s’explique probablement par leur capacité à se créer de nombreuses occasions, sans toujours parvenir à les convertir.
+- 🔵 Une corrélation apparaît entre les équipes "chanceuses" (ayant marqué plus de buts que leurs xG) et leur performance en championnat.
 
-À l’inverse, des clubs comme Norwich ou Alavés, bons derniers de leurs championnats respectifs, illustrent que parfois la "malchance" n’est pas en cause : il s’agit simplement de saisons ratées globalement, à tous les niveaux.
+- 🔵 Parmi ces équipes : **Dortmund (2ᵉ Bundesliga)**, **Lazio (5ᵉ Serie A)**, **Rennes (4ᵉ Ligue 1)**, **Leverkusen (3ᵉ Bundesliga)**, **Naples (3ᵉ Serie A)** et **PSG (champion de Ligue 1)**. Hormis les très grands clubs comme le PSG, ces équipes ont souvent réalisé l’une de leurs meilleures saisons.
 
-✅ **Conclusion** :Il semble que les équipes dites "chanceuses" surperforment souvent en championnat, ce qui peut renforcer leur dynamique positive. À l’inverse, les "malchanceuses" ne sont pas toujours en échec, mais leur manque de réalisme peut freiner leur progression. Pour ces dernières, investir dans un buteur performant pourrait être une stratégie judicieuse, si les moyens financiers le permettent.
+- 🔵 Des clubs comme **Hellas Vérone (9ᵉ en Serie A cette saison-là, 17ᵉ la suivante)** ou **Nantes (9ᵉ en Ligue 1, contre 18ᵉ puis 17ᵉ les saisons encadrantes)** témoignent également de performances supérieures à leur niveau habituel, suggérant une **saison de surperformance**.
+
+- 🔵 À l’inverse, les équipes "malchanceuses" (xG élevés mais peu de buts marqués) sont souvent bien classées : **Real Sociedad (6ᵉ)**, **Genoa (11ᵉ)**, **Lorient (10ᵉ)**, **Athletic Club (8ᵉ)**, **Clermont (8ᵉ)**, **Rayo Vallecano (12ᵉ)**, **Wolfsburg (12ᵉ)**. Leur bon classement s'explique par une capacité à se créer de nombreuses occasions, sans les concrétiser pleinement.
+
+- 🔵 Enfin, des équipes comme **Norwich** ou **Alavés**, derniers de leurs championnats, montrent que la "malchance" ne suffit pas toujours à expliquer les résultats : certaines saisons sont simplement ratées dans leur ensemble.
 
 ---
 
