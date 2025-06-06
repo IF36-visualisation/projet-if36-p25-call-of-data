@@ -74,7 +74,7 @@ Ces données permettent d’analyser à la fois les performances sportives (indi
 | Quel est l’impact des transferts sur l’évolution des performances entre 2021-2022 et 2022-2023 ?      | `Pts`, `club`, `season`, `fee`                                 | Scatter plot ou évolution en ligne        | Évaluer l’évolution des clubs suite à leur politique de recrutement                      |
 | Quels postes sont les plus valorisés sur le marché ?                                                  | `position`, `fee`                                              | Bar chart                                 | Identifier les postes les plus chers sur le marché                                       |
 | Quels clubs ont le plus recruté par poste ? (top 20 clubs)                                            | `club_to`, `position`                                          | Heatmap                                   | Visualiser la spécialisation des clubs par ligne de jeu                                  |
-
+| Quel est le profil défensif des meilleurs défenseurs européens ?                                      | `Player`, `Tkl`, `Int`, `AerWon.`, `Blocks`, `Clr`, `X90s`     | Radar chart                           | Comparer les profils défensifs selon 5 indicateurs normalisés par match                   |
 
 
 ------------------------------------------------------------------------
