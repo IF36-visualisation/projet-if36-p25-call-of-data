@@ -836,64 +836,90 @@ ggplot(top_malchanceuses, aes(x = reorder(Squad, delta_goals), y = delta_goals))
 
 ---
 
-### **Question 11 : Les clubs ayant recruté plus de joueurs ont-ils mieux performé ? **
+### **Question 11 : Quel est le profil défensif des meilleurs défenseurs européens ? **
 
 #### 🎯 Objectif:
-Étudier s’il existe une relation entre le nombre de recrues lors du mercato estival 2022 et l’évolution des performances sportives des clubs entre 2021-2022 et 2022-2023.
+L’objectif de cette analyse est de comparer le profil défensif de quatre des meilleurs défenseurs centraux évoluant dans les cinq grands championnats européens sur la saison 2021-2022.
+À l’aide de cinq indicateurs clés (tacles, interceptions, duels aériens, blocs défensifs, dégagements), nous cherchons à mettre en évidence les forces dominantes de chaque joueur et à déterminer si leur rôle varie en fonction des spécificités tactiques propres à leur championnat ou à leur équipe.
+
+L’analyse est visualisée sous forme de radar chart, permettant une lecture globale et comparative des différents profils.
 
 #### 🧪 Hypothèse :
-Les clubs qui ont recruté beaucoup de joueurs lors du mercato estival 2022 ont mieux performé en 2022-2023 (gagné plus de points par rapport à 2021-2022).
+Nous formulons l’hypothèse que chaque défenseur excelle dans un type d’intervention défensive qui correspond à :son style de jeu personnel,les besoins spécifiques de son équipe, ou encore aux caractéristiques du championnat dans lequel il évolue.
+
+Par exemple, un joueur comme Virgil van Dijk pourrait exceller dans les duels aériens en raison du rythme physique de la Premier League, tandis que David Alaba aurait un profil plus polyvalent ou technique adapté au style de jeu du Real Madrid en Liga.
 
 
-```{r}
-# Créer une variable catégorisant les clubs selon leur volume de recrutement
-df_recrues <- df_recrues %>%
-  mutate(cat_recrutement = case_when(
-    nb_joueurs <= 3 ~ "Recrutement faible (≤3)",
-    nb_joueurs <= 6 ~ "Recrutement modéré (4-6)",
-    nb_joueurs > 6 ~ "Recrutement massif (≥7)"
-  ))
+```{r radar_defenseurs_final, fig.width=7, fig.height=7}
+library(dplyr)
+library(fmsb)
 
-# Affichage du boxplot avec jitter
-ggplot(df_recrues, aes(x = cat_recrutement, y = variation_pts, fill = cat_recrutement)) +
-  geom_boxplot(alpha = 0.6, outlier.shape = NA) +
-  geom_jitter(width = 0.15, size = 2.5, alpha = 0.7, color = "black") +
-  labs(
-    title = "Impact du volume de recrutement sur la performance des clubs",
-    x = "Volume de recrutement (été 2022)",
-    y = "Évolution du nombre de points (2022-2023 vs 2021-2022)"
-  ) +
-  scale_fill_brewer(palette = "Set2") +
-  theme_minimal() +
-  theme(legend.position = "none")
+# Sélection des joueurs représentatifs par championnat
+joueurs <- c("Virgil van Dijk", "Marquinhos", "Kalidou Koulibaly", "David Alaba")
 
+# Création des indicateurs normalisés par 90 minutes
+defenseurs <- player_stats_2021_2022 %>%
+  filter(Player %in% joueurs, X90s > 5) %>%
+  mutate(
+    Tacles90 = Tkl / X90s,
+    Interceptions90 = Int / X90s,
+    DuelsAerienPct = AerWon.,
+    Blocs90 = Blocks / X90s,
+    Degagements90 = Clr / X90s
+  ) %>%
+  select(Player, Tacles90, Interceptions90, DuelsAerienPct, Blocs90, Degagements90) %>%
+  column_to_rownames("Player")
 
+# Ajouter lignes max / min pour fmsb
+radar_def <- rbind(
+  apply(defenseurs, 2, max),
+  apply(defenseurs, 2, min),
+  defenseurs
+)
 
+# Renommer les colonnes pour plus de clarté
+colnames(radar_def) <- c(
+  "Tacles/90m",
+  "Interceptions/90m",
+  "Duels aériens (%)",
+  "Blocs/90m",
+  "Dégagements/90m"
+)
 
+# Réduction des marges et affichage radar
+par(mar = c(2, 2, 2, 2))
+
+# Couleurs améliorées (Alaba passe en violet foncé)
+radarchart(
+  radar_def,
+  axistype = 1,
+  pcol = c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3"),  # rouge, bleu, vert, violet
+  pfcol = c("#E41A1C50", "#377EB850", "#4DAF4A50", "#984EA350"),
+  plwd = 2,
+  cglcol = "grey",
+  cglty = 1,
+  axislabcol = "grey",
+  vlcex = 0.9,
+  title = "Profil défensif des meilleurs défenseurs par championnat (2021-2022)"
+)
+
+legend(
+  "topright",
+  legend = rownames(defenseurs),
+  col = c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3"),
+  lty = 1,
+  lwd = 2,
+  bty = "n"
+)
 
 
 ```
-
-
 #### 🧠 Interprétation du graphique:
-On distingue les clubs selon trois catégories de recrutement :
-
-Recrutement faible (≤3 joueurs)
-
-Recrutement modéré (4 à 6 joueurs)
-
-Recrutement massif (≥7 joueurs)
-
-Chaque point représente un club. Le boxplot montre la distribution des évolutions de points dans chaque groupe :
-
-La médiane est très similaire dans les trois groupes (~ -10 points), ce qui signifie qu’en moyenne, aucun groupe ne se démarque fortement. Le groupe "Recrutement faible" montre une plus grande dispersion (avec des clubs très fortement en baisse), ce qui peut indiquer une plus grande instabilité. Le groupe "Recrutement modéré" est plus concentré autour de la médiane, avec peu de variation. Et enfin le groupe "Recrutement massif" est petit mais montre une dispersion assez importante également.
+Le radar chart permet de comparer les performances de Virgil van Dijk (Premier League), Marquinhos (Ligue 1), Kalidou Koulibaly (Serie A) et David Alaba (La Liga), chacun représenté par une couleur distincte. On observe par exemple que Van Dijk domine clairement les duels aériens, ce qui confirme son rôle de tour de contrôle défensive à Liverpool. Marquinhos propose un profil très équilibré, performant sur l’ensemble des dimensions, ce qui reflète sa régularité au PSG. Koulibaly est particulièrement actif dans les dégagements et les blocs, montrant une approche défensive plus réactive et physique. Alaba, en revanche, a un profil moins centré sur l’impact physique, ce qui correspond à son rôle souvent hybride (défenseur/milieu) dans un style de jeu plus construit à Madrid.
 
 ✅ **Conclusion** :  
+Cette visualisation met en lumière la diversité des profils défensifs au plus haut niveau européen. Chaque joueur excelle dans des dimensions différentes, illustrant que la performance défensive ne se limite pas à une seule statistique, mais dépend de l’environnement tactique, du style d’équipe et du championnat. Le radar chart est ici un outil efficace pour identifier les points forts et les spécialisations de chacun, tout en offrant une représentation synthétique d’indicateurs hétérogènes mais complémentaires.
 
-Selon cette visualisation, on n’observe pas de lien clair entre le volume de recrutement et la progression des performances des clubs.
-La médiane est négative dans tous les groupes, et aucune catégorie ne montre une amélioration globale.
-
-Ce résultat suggère que le volume seul ne suffit pas à prédire la performance : des facteurs qualitatifs comme la qualité des recrues, leur intégration ou le coaching peuvent être plus déterminants.
 ---
 
 ### **Question 12 : Quels clubs sont les plus dépendants de leur meilleur buteur ?**
@@ -909,14 +935,14 @@ Certains clubs dépendent fortement d’un seul joueur pour marquer des buts. Ce
 
 
 ```{r}
-# Extraction du nombre de buts depuis le champ "Buteur"
+# Extraction depuis la colonne unique "Buteur"
 team_stats_2021_2022 <- team_stats_2021_2022 %>%
   mutate(
-    Nb_buts_buteur = str_extract(Buteur, "\\d+$"),
+    Nb_buts_buteur = str_extract(Top.Team.Scorer, "\\d+$"),             # extrait le chiffre à la fin
+    Buteur = str_remove(Top.Team.Scorer, "\\s*-\\s*\\d+$"),              # supprime le " - 15" du nom
     Nb_buts_buteur = as.numeric(Nb_buts_buteur),
-    Buteur = str_trim(str_remove(Buteur, "–\\s*\\d+$"))
-  ) %>%
-  mutate(dep_buteur = Nb_buts_buteur / GF)
+    dep_buteur = Nb_buts_buteur / GF
+  )
 
 # Top 10 des clubs les plus dépendants
 top_dependance <- team_stats_2021_2022 %>%
@@ -924,7 +950,7 @@ top_dependance <- team_stats_2021_2022 %>%
   arrange(desc(dep_buteur)) %>%
   slice_head(n = 10)
 
-# Graphique
+# Visualisation
 ggplot(top_dependance, aes(x = reorder(Squad, dep_buteur), y = dep_buteur)) +
   geom_col(fill = "#0072B2") +
   coord_flip() +
@@ -935,6 +961,7 @@ ggplot(top_dependance, aes(x = reorder(Squad, dep_buteur), y = dep_buteur)) +
   ) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   theme_minimal()
+
 
 
 
@@ -970,37 +997,48 @@ Analyser s’il existe une relation entre les montants investis par les clubs pe
 Les clubs ayant dépensé davantage lors du mercato estival 2022 ont obtenu de meilleurs résultats sportifs la saison suivante.
 
 ```{r}
-# Nettoyage de la variable "fee" (valeur du transfert)
+# 1️⃣ Nettoyage des montants investis
 transfers_clean <- transfers_2022 %>%
   filter(!fee %in% c("Free", "Loan", "", NA)) %>%
   mutate(fee = str_remove_all(fee, "€|m|\\s"),
-         fee = as.numeric(fee))  # en millions d’euros
+         fee = as.numeric(fee))  # en millions
 
-# Calcul des investissements totaux par club d’arrivée
+# 2️⃣ Création d'un identifiant club unifié
+clean_name <- function(x) {
+  x %>%
+    str_to_lower() %>%
+    str_replace_all("[^a-z0-9]", "") %>%
+    str_trim()
+}
+
+# 3️⃣ Total des investissements par club (nettoyé)
 investissements <- transfers_clean %>%
-  group_by(club_to) %>%
+  mutate(club_clean = clean_name(club_to)) %>%
+  group_by(club_clean) %>%
   summarise(invest_total = sum(fee, na.rm = TRUE))
 
-# Préparer la table avec variation de points (déjà calculée ailleurs)
+# 4️⃣ Variation de points avec nom de club nettoyé
 variation_points <- team_stats_2022_2023 %>%
   select(Squad, Pts) %>%
-  rename(club_to = Squad, Pts_22_23 = Pts) %>%
-  left_join(select(team_stats_2021_2022, Squad, Pts), by = c("club_to" = "Squad")) %>%
+  rename(club = Squad, Pts_22_23 = Pts) %>%
+  left_join(select(team_stats_2021_2022, Squad, Pts),
+            by = c("club" = "Squad")) %>%
   rename(Pts_21_22 = Pts) %>%
-  mutate(variation_pts = Pts_22_23 - Pts_21_22)
+  mutate(variation_pts = Pts_22_23 - Pts_21_22,
+         club_clean = clean_name(club))
 
-# Fusion des données
-df_invest <- left_join(variation_points, investissements, by = "club_to") %>%
+# 5️⃣ Fusion finale + filtre
+df_invest <- left_join(variation_points, investissements, by = "club_clean") %>%
   filter(!is.na(invest_total))
 
-# Scatter plot
+# 6️⃣ Visualisation : scatter + droite de tendance
 ggplot(df_invest, aes(x = invest_total, y = variation_pts)) +
   geom_point(size = 3, alpha = 0.7, color = "#E69F00") +
   geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "dashed") +
   labs(
     title = "Lien entre investissement estival et progression en points",
     x = "Montant investi (en millions €)",
-    y = "Évolution du nombre de points"
+    y = "Évolution du nombre de points (2022-2023 vs 2021-2022)"
   ) +
   theme_minimal()
 
@@ -1009,21 +1047,17 @@ ggplot(df_invest, aes(x = invest_total, y = variation_pts)) +
 
 
 #### 🧠 Interprétation du graphique:
-Ce graphique met en relation le montant investi par chaque club lors du mercato estival 2022 et la variation de points obtenue entre les saisons 2021-2022 et 2022-2023.
+Ce graphique met en relation le montant investi par chaque club lors du mercato estival 2022 et la variation du nombre de points obtenue entre les saisons 2021-2022 et 2022-2023. Chaque point représente un club : l’axe horizontal indique le montant total investi (en millions d’euros), tandis que l’axe vertical reflète l’évolution des performances sportives, mesurée par la différence de points entre les deux saisons.
 
-Chaque point représente un club :
+La droite de tendance (régression linéaire) présente une légère pente négative, ce qui indique que, dans notre échantillon, les clubs ayant le plus investi ont en moyenne connu une régression en termes de points.
 
-- L’axe horizontal indique le montant total investi en millions d’euros.
-- L’axe vertical indique l’évolution du nombre de points sur une saison.
-
-La droite de tendance (régression linéaire) montre une légère pente négative, ce qui signifie que plus un club a investi, moins il a eu tendance à progresser en termes de points.
+Il est important de noter que le nombre de clubs présents dans ce graphique est limité. En effet, seuls les clubs figurant à la fois dans les tableaux de transferts et dans les données sportives des deux saisons peuvent être utilisés pour cette analyse, ce qui réduit la taille de l’échantillon. Toutefois, malgré ce nombre restreint, la visualisation reste utile : elle permet de soulever une tendance observable et invite à questionner l’efficacité réelle des investissements.
 
 ✅ **Conclusion** :  
 
-Cette visualisation suggère que les investissements élevés ne se traduisent pas systématiquement par une amélioration des résultats sportifs.
-Au contraire, la tendance observée dans notre échantillon montre une corrélation légèrement négative entre les montants investis et la progression en points.
+Cette visualisation suggère que les investissements élevés ne garantissent pas nécessairement une amélioration des résultats sportifs. La légère tendance négative observée indique même qu’un recrutement massif peut s’accompagner d’une stagnation, voire d’une régression, en termes de performances.
 
-Ce résultat met en évidence que le budget seul ne suffit pas : la qualité du recrutement, l’intégration des joueurs, la stratégie de jeu ou encore la stabilité de l’effectif peuvent jouer un rôle plus important que la dépense brute.
+Cela montre que le budget alloué au mercato n’est pas, à lui seul, un levier suffisant de réussite. La cohérence du projet sportif, la qualité du recrutement, l’intégration des joueurs ou encore la stabilité du staff peuvent avoir un impact bien plus significatif que la simple dépense brute. Ces résultats invitent à aller au-delà des montants investis pour comprendre les véritables ressorts de la performance sportive.
 ---
 
 ### **Question 14 : Quels sont les meilleurs milieux de terrain en termes de création ?**
