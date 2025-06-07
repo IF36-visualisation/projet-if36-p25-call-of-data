@@ -1,16 +1,32 @@
 ---
-title: "Rapport"
-author: "Ahamad MOHAMMAD; Minko Bikono NEIL-JOVY; Simon GELBART; Willen AMICHE"
+title: "Rapport IF36"
+author: "Ahamad MOHAMMAD, Minko Bikono NEIL-JOVY, Simon GELBART, Willen AMICHE"
 date: "`r Sys.Date()`"
 output:
-  pdf_document:
-    latex_engine: xelatex
+  prettydoc::html_pretty:
+    theme: cayman       
+    highlight: github   
+    toc: true
+    toc_depth: 3
+encoding: UTF-8
 ---
 
 
-## **Introduction**
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,     
+  warning = FALSE,  
+  message = FALSE   
+)
+```
 
-Notre objectif est d’explorer l’impact des stratégies de recrutement sur les performances sportives des clubs et joueurs. En combinant des statistiques individuelles, collectives et des données de transferts, nous chercherons à identifier les tendances qui influencent la réussite des équipes sur plusieurs saisons. 
+
+
+## **Introduction**
+L’objectif de ce projet est d’explorer l’impact des stratégies de recrutement sur les performances sportives des clubs de football et de leurs joueurs. En croisant des statistiques individuelles (performances des joueurs), des données collectives (résultats d’équipes) et les transferts réalisés lors du mercato estival 2022, nous cherchons à identifier les leviers de performance et à mieux comprendre les choix stratégiques opérés par les clubs.
+Notre analyse se base sur deux saisons complètes (2021-2022 et 2022-2023), afin de mesurer l’évolution des résultats d’une année sur l’autre et de relier cette évolution aux dynamiques de recrutement. À travers plusieurs angles d’analyse (volume de transferts, postes ciblés, valeur marchande, origine des joueurs, rendement, etc.), nous chercherons à répondre à une série de questions permettant de quantifier et qualifier l'effet des recrutements sur la réussite des équipes.
+
+ 
 
 
 ### **📊 Description des variables**
@@ -90,6 +106,11 @@ Même structure et signification que pour 2021-2022, mais avec la saison suivant
 
 library(tidyverse)
 library(ggplot2)
+library(scales)
+library(dplyr)
+library(stringr)
+library(ggalluvial)
+library(fmsb)
 ```
 
 
@@ -102,20 +123,58 @@ team_stats_2022_2023 <- read.csv("data/2022-2023 Football Team Stats.csv", sep =
 transfers_2022 <- read.csv("data/2022_2023_football_summer_transfers.csv", sep = ",", fileEncoding = "ISO-8859-1")
 ```
 
+
+```{r}
+# Traduction des postes 
+transfers_2022 <- transfers_2022 %>%
+  mutate(position = str_trim(position)) %>%
+  mutate(position = recode(position,
+    "Centre-Forward" = "Attaquant",
+    "Second Striker" = "Attaquant",
+    "Forward Attacker" = "Attaquant",
+    "attack" = "Attaquant",
+
+    "Right Winger" = "Ailier droit",
+    "Right Midfield" = "Ailier droit",
+
+    "Left Winger" = "Ailier gauche",
+    "Left Midfield" = "Ailier gauche",
+
+    "Attacking Midfield" = "Milieu offensif",
+    "Defensive Midfield" = "Milieu défensif",
+    "Central Midfield" = "Milieu central",
+
+    "Centre-Back" = "Défenseur central",
+    "defence" = "Défenseur central",
+    "Left-Back" = "Défenseur gauche",
+    "Right-Back" = "Défenseur droit",
+
+    "Goalkeeper" = "Gardien de but",
+
+    .default = "Autre"
+  ))
+
+```
+
 ---
 
-### **Question 1:** Quels clubs ont le plus recruté par poste (top 20) ?
+### **Question 1 : Quels clubs ont le plus recruté par poste (top 20) ?**
 
 #### 🎯 Objectif:
 Identifier les **20 clubs les plus actifs** lors du mercato d’été 2022 en termes de nombre de recrues, puis visualiser quels postes ont été ciblés en priorité par ces clubs. Cela permet de mieux comprendre les **stratégies de renforcement** des effectifs selon les lignes de jeu (défense, milieu, attaque).
 
+#### 🧪 Hypothèse :
+Nous supposons que les clubs ayant terminé en bas de classement ou nouvellement promus ont davantage recruté, notamment en défense et au milieu, dans une logique de **renforcement pour assurer le maintien**. À l’inverse, les clubs plus stables ou ambitieux auraient fait un recrutement plus ciblé et réparti entre les lignes.
 
 
-```{r}
+
+```{r message=FALSE}
 # Code
+#pr bien lire les accent on met en UTF
+transfers_2022_q1 <- read.csv("data/2022_2023_football_summer_transfers.csv", sep = ",", fileEncoding = "UTF-8")
 
 # Nettoyage de base
-transfers_clean <- transfers_2022 %>%
+transfers_clean <- transfers_2022_q1 %>%
   filter(!is.na(club_to), !is.na(position), position != "")
 
 # Regrouper et compter
@@ -150,170 +209,146 @@ ggplot(recrutements_top, aes(x = position, y = fct_reorder(club_to, nb_recrues),
 
 #### 🧠 Interprétation du graphique:
 
-- 🔵 **US Salernitana 1919** est le club qui a le plus recruté tous postes confondus, avec un **focus important sur les milieux offensifs** et **défenseurs centraux**.
+- 🔵 **US Salernitana 1919**, un club ayant lutté pour le maintien en Serie A, est celui qui a le plus recruté tous postes confondus, avec un **focus important sur les milieux offensifs** et **défenseurs centraux**. Cela **confirme notre hypothèse**.
 
-- 🔵 **US Lecce**, **US Cremonese** et **Udinese Calcio** (clubs italiens) montrent aussi une stratégie de **renforcement défensif**, particulièrement en **centre-back**.
+- 🔵 D’autres clubs comme **US Lecce**, **US Cremonese** et **Udinese Calcio**, également engagés dans la lutte pour le maintien, présentent aussi une stratégie de **renforcement défensif**, particulièrement au poste de **centre-back**.
 
-- 🔵 **Olympique de Marseille** et **Nottingham Forest** ont **diversifié leurs recrutements** sur plusieurs lignes, y compris **les ailes** (*left/right winger*).
+- 🔵 En revanche, certains clubs comme **Olympique de Marseille** ou **Nottingham Forest**, pourtant positionnés plus haut (ou avec de grandes ambitions), ont **diversifié leurs recrutements** sur plusieurs lignes, ce qui nuance l’hypothèse. Cela peut refléter une stratégie de **reconstruction d’effectif** ou de préparation à des compétitions européennes.
 
-- 🎯 On observe une **forte demande en milieux de terrain**, notamment :
-  - *Attacking Midfield*
-  - *Defensive Midfield*
-  - *Centre Midfield*
+- 🔵 On observe une **forte demande en milieux de terrain**, avec une concentration sur les postes de *milieu central*, *défensif* et *offensif*, ce qui correspond bien à l’idée que la maîtrise du milieu de terrain reste cruciale dans le football moderne.
 
--  Peu de clubs ont recruté plusieurs **gardiens**, ce qui est logique : un club n’en fait souvent venir qu’un seul par saison.
+- Peu de clubs ont recruté plusieurs **gardiens**, ce qui est conforme aux pratiques usuelles : un club ne recrute généralement qu’un seul gardien par saison.
 
--  Certains clubs comme **FC Empoli** ou **OGC Nice** présentent une stratégie de recrutement **équilibrée sur différentes lignes**, ce qui pourrait indiquer un **renouvellement global de l’effectif**.
+- Enfin, certains clubs comme **FC Empoli** ou **OGC Nice** ont adopté une stratégie plus équilibrée, en recrutant sur plusieurs lignes, ce qui peut traduire un **renouvellement global** plutôt qu’un ajustement spécifique.
+
+✅ **Conclusion** : l’hypothèse est **globalement confirmée** – les clubs les moins bien classés ont recruté plus, notamment en défense. Toutefois, des exceptions existent, liées à des objectifs plus stratégiques ou spécifiques (comme l’Europe ou le changement d’entraîneur).
 
 
 ---
 
-### **Question 2:** Quels postes sont les plus valorisés sur le marché ?
+### **Question 2: Quels postes sont les plus valorisés sur le marché ?**
 
 
 #### 🎯 Objectif:
-Visualiser la valeur marchande des joueurs par poste pour comprendre quels types de profils sont les plus prisés financièrement sur le marché. Cela permet de hiérarchiser les postes selon leur importance économique dans le football professionnel. Pour ça, on se base sur le mercato qui a eu lieu durant l'été 2022.
+Visualiser la valeur marchande des joueurs par poste pour comprendre quels types de profils sont les plus prisés financièrement sur le marché. Cela permet de hiérarchiser les postes selon leur importance économique dans le football professionnel, sur la base du mercato d’été 2022.
+
+#### 🧪 Hypothèse :
+Nous pensons que les **attaquants** seront les plus valorisés sur le marché, en raison de leur impact direct sur les résultats et leur potentiel marketing. Les **défenseurs centraux** et **milieux offensifs** devraient aussi avoir une valeur élevée. À l'inverse, les **gardiens** devraient être en bas de l’échelle.
 
 
-```{r}
+```{r message=FALSE}
 
-# Nettoyage des données
+# Nettoyage et préparation des données de transfert
 transfers_clean <- transfers_2022 %>%
   filter(!is.na(position), !is.na(market_value)) %>%
   distinct(name, position, age, .keep_all = TRUE) %>%
   mutate(
-    market_value_num = as.numeric(market_value)  # Convertir les valeurs en numérique
+    market_value = gsub("[^0-9\\.]", "", market_value), 
+    market_value_num = as.numeric(market_value)
   ) %>%
-  filter(market_value_num >= 1.5)  # Filtrer les valeurs négatives/nulles ou pas réalistes genre en dessous de 1.5 millions
-
-# On crée une colonne pour regrouper certains postes qui sont très proches
-transfers_clean <- transfers_clean %>%
-  mutate(position_fr = position) %>%
-  mutate(position_fr = recode(position_fr,
-                              "Second Striker" = "Attaquant",
-                              "Centre-Forward" = "Attaquant",
-                              "Forward Attacker" = "Attaquant",
-                              "attack" = "Attaquant",
-                              "Right Midfield" = "Ailier droit",
-                              "Left Midfield" = "Ailier gauche",
-                              "Attacking Midfield" = "Milieu offensif",
-                              "Central Midfield" = "Milieu central",
-                              "Defensive Midfield" = "Milieu central", 
-                              "Centre-Back" = "Défenseur central",
-                              "defence" = "Défenseur central",
-                              "Right Winger" = "Ailier droit",
-                              "Left Winger" = "Ailier gauche", 
-                              "Left-Back" = "Défenseur gauche",
-                              "Right-Back" = "Défenseur droit",
-                              "Goalkeeper" = "Gardien de but",
-                              .default = position_fr))  # Par défaut, on garde la position d'origine
+  filter(market_value_num >= 1.5)
 
 # Calcul de la moyenne et de l'écart-type des valeurs marchandes par poste
 transfers_clean_stats <- transfers_clean %>%
-  group_by(position_fr) %>%
-  filter(n() >= 5) %>%  
+  group_by(position) %>%
+  filter(n() >= 5) %>%
   summarise(
     mean_value = mean(market_value_num, na.rm = TRUE),
     sd_value = sd(market_value_num, na.rm = TRUE)
   )
 
-# Visualisation avec un barplot et des barres d'erreur pour voir les postes qui ont une grosse différence de prix
-ggplot(transfers_clean_stats, aes(x = reorder(position_fr, mean_value), y = mean_value)) +
+# Visualisation avec titres en français
+ggplot(transfers_clean_stats, aes(x = reorder(position, mean_value), y = mean_value)) +
   geom_bar(stat = "identity", fill = "#4CAF50") +  
   geom_errorbar(aes(ymin = pmax(mean_value - sd_value, 0), ymax = mean_value + sd_value), width = 0.2) +
   labs(
     title = "Valeur marchande moyenne par poste (mercato été 2022)",
-    x = "Poste",
-    y = "Valeur marchande moyenne (Millions d'€)"
+    x = "Poste (en anglais)",
+    y = "Valeur marchande moyenne (en millions d'euros)"
   ) +
   theme_minimal(base_size = 12) +
   coord_flip()
 
 
-
-transfers_clean %>%
-  count(position_fr, sort = TRUE)
-print(transfers_clean %>% count(position_fr, sort = TRUE))
-
-
-
 ```
 
 
-#### 🧠 Interprétation du graphique:
-Attaquant et Buteur : Les attaquants sont les joueurs les plus valorisés sur le marché, avec une valeur moyenne qui dépasse largement celle des autres postes. Cela reflète l'importance des joueurs offensifs dans le football moderne, où les buts et les performances offensives sont souvent décisives mais surtout les attaquants sont souvent les joueurs qui attirent le plus l'attention des fans et des médias, ce qui en fait des atouts marketing précieux pour les clubs et qui explique leur valeur bien plus élevé
+#### 🧠 Interprétation du graphique :
 
-Défenseur central : Les défenseurs centraux occupent la deuxième place en termes de valeur marchande. Leur rôle crucial dans la stabilité défensive et leur capacité à organiser la défense expliquent cette valorisation élevée. Un bon défenseur central peut être la clé de voûte d'une équipe solide et équilibrée.
+Ce graphique combine deux informations importantes :
 
-Ailier droit et Ailier gauche : Les ailiers, qu’ils soient droits ou gauches, présentent une valeur marchande significative sur le marché des transferts avec respectivement la 3ème et 5ème place. Toutefois, on observe souvent une légère survalorisation des ailiers droits. Cette différence peut s’expliquer par la rareté relative des ailiers droits car cela implique souvent d'être gaucher, pour être capables de repiquer dans l’axe et de frapper avec leur pied fort. Ce profil est très recherché dans le football moderne d’où une valorisation plus élevée.
+- les barres vertes indiquent la valeur marchande moyenne des joueurs par poste ;
 
-Milieu central et offensif : Les milieux centraux, souvent considérés comme les "poumons" de l'équipe, sont également très valorisés. Leur polyvalence et leur capacité à influencer le jeu dans les deux sens en font des acteurs clés sur le marché. Paradoxalement, les milieux offensifs semblent être moins bien valorisés. C'est un poste qui, dans le football moderne, a perdu de sa splendeur par rapport à avant et c'est caractérisé par une baisse de la valeur marchande à ce poste.
+- les barres noires (barres d’erreur) représentent l’écart-type, c’est-à-dire la variabilité des valeurs selon les profils.
 
-Défenseur gauche et Défenseur droit : Les défenseurs latéraux, bien que moins valorisés que les défenseurs centraux, restent importants.Ils sont très recherchés dans le football moderne car ils doivent être polyvalents, capables de défendre et d'attaquer efficacement.On ne retrouve pas la rareté des latéraux droit par rapport au gauche comme on peut avoir avec les ailiers et on remarque qu'à l'inverse les latéraux gauche on tendance à avoir une plus grosse valeur marchande. 
+- 🔵 Les attaquants sont effectivement les plus valorisés, avec une moyenne nettement supérieure. Cela confirme leur rôle stratégique et commercial. Leur forte variabilité montre que certains sont recrutés à prix très élevé, tirant la moyenne vers le haut.
 
-Gardien de but : Les gardiens de but sont nettement moins valorisés que les autres postes. Cela s’explique en partie par la spécificité de ce rôle, qui diffère fortement des autres positions sur le terrain. Par extension, c’est aussi le poste le moins "vendeur" du football, ce qui se reflète dans leur valeur marchande.
+- 🔵 Les défenseurs centraux arrivent en seconde position, avec une valeur moyenne élevée et une dispersion plus contenue, signe d’une reconnaissance stable de leur importance.
 
+- 🔵 Les ailiers droits et gauches présentent aussi des valeurs élevées, ce qui reflète la rareté de certains profils très recherchés (notamment les ailiers gauchers jouant à droite).
+
+- 🔵 Les milieux offensifs sont un peu moins valorisés que prévu, et affichent une grande hétérogénéité : cela suggère une disparité importante entre quelques stars très coûteuses et d’autres profils plus modestes.
+
+- 🔵 Les gardiens sont les moins valorisés, avec une moyenne basse et une variabilité plus réduite, ce qui traduit leur statut secondaire sur le marché.
+
+✅ Conclusion : L’hypothèse est largement confirmée. Les attaquants et défenseurs centraux dominent en valeur. L’ajout des barres d’erreur révèle aussi des disparités fortes sur certains postes, notamment offensifs, ce qui enrichit l’analyse au-delà des moyennes seules.
 
 
 ---
 
-### **Question 3:** Corrélation entre xG et points ? 
+
+### **Question 3 : Corrélation entre xG (expected goals) et points ?**
 
 #### 🎯 Objectif:
+Analyser si le nombre d’expected goals (xG) réalisés par une équipe est corrélé avec son total de points en championnat. Cela permet de vérifier si produire beaucoup d’occasions de qualité est un bon indicateur de performance globale. Les expected goals (xG) mesurent la probabilité qu’un tir se transforme en but, en fonction de facteurs comme la position du tir, le type d’action, l’angle de tir ou la pression défensive. En somme, plus une équipe cumule d’xG, plus elle est censée marquer. Données utilisées : saison 2022-2023.
 
-Analyser si le nombre d’expected goals (xG) réalisés par une équipe est corrélé avec son total de points en championnat. Cela permet de vérifier si produire beaucoup d’occasions (même sans forcément marquer) est un bon indicateur de performance globale.
-On utilise les données de la saison 2022-2023.
+#### 🧪 Hypothèse :
+Nous pensons qu’il existe une **corrélation positive significative** entre les xG et le total de points. Une équipe qui se crée beaucoup d’occasions de qualité a plus de chances de gagner des matchs, même si la finition varie.
 
 
-```{r}
-# On utilise les données de la saison 2022-2023
+```{r message=FALSE}
 team_stats_22_23 <- team_stats_2022_2023 %>%
-  select(Squad, xG, Pts)
-
-# Nettoyage basique : on supprime les NA au cas où
-team_stats_22_23 <- team_stats_22_23 %>%
+  select(Squad, xG, Pts) %>%
   filter(!is.na(xG), !is.na(Pts))
 
-# Visualisation scatter plot
 ggplot(team_stats_22_23, aes(x = xG, y = Pts)) +
   geom_point(color = "#1f77b4", size = 3) +
-  geom_smooth(method = "lm", se = FALSE, color = "red", linetype = "dashed") +
+  geom_smooth(method = "lm", color = "red", linetype = "dashed", se = TRUE) +  # se = TRUE pour afficher l'intervalle
   labs(
-    title = "Corrélation entre Expected Goals (xG) et Points en championnat (2022-23)",
+    title = "Corrélation entre Expected Goals (xG) et Points en championnat(2022-23)",
     x = "Expected Goals (xG)",
-    y = "Points",
-    caption = "Source : 2022-2023 Football Team Stats.csv"
+    y = "Points"
   ) +
   theme_minimal(base_size = 12)
 
-# Calcul du coefficient de corrélation de Pearson
-cor_xg_pts <- cor(team_stats_22_23$xG, team_stats_22_23$Pts, use = "complete.obs")
-paste0("Coefficient de corrélation de Pearson : ", round(cor_xg_pts, 3))
 
 ```
 
 
 #### 🧠 Interprétation du graphique:
-Le graphique montre qu’il existe une forte corrélation positive entre les expected goals (xG) et les points obtenus en championnat lors de la saison 2022-2023. Le coefficient de corrélation de Pearson est de 0,815, ce qui indique qu’en général, plus une équipe génère d’occasions de but de qualité (mesurées par les xG), plus elle obtient de points au classement. Cela confirme que produire beaucoup d’occasions est un élément important pour réussir sur toute une saison.
 
-Cependant, la relation n’est pas parfaite. On observe que certains points sont assez éloignés de la tendance générale. Cela peut s’expliquer par plusieurs facteurs, comme l’efficacité offensive, c’est-à-dire la capacité à transformer les occasions en buts, ou encore la solidité défensive. Une équipe peut créer beaucoup d’occasions mais manquer de réalisme ou encaisser trop de buts, ce qui limite son total de points.
+- 🔵 Le nuage de points présente une **tendance linéaire positive** entre les xG et les points, confirmée par la droite de régression.
 
-En résumé, les expected goals sont un bon indicateur des performances d’une équipe, mais ils ne suffisent pas à eux seuls pour expliquer complètement les résultats. D’autres aspects du jeu, comme la finition ou la défense, restent essentiels.
+- 🔵 Cela suggère que les équipes qui se créent beaucoup d’occasions obtiennent en général plus de points, ce qui **valide notre hypothèse**.
+
+- 🔵 Certaines équipes dévient de la tendance (sous-performance ou efficacité maximale), ce qui montre que les xG ne suffisent pas à eux seuls à expliquer les résultats.
+
+✅ **Conclusion** : L’hypothèse est **confirmée**. Il existe une forte corrélation entre production offensive (xG) et performance en championnat.
 
 ---
 
-### **Question 4:** Quel est l'impact des transferts sur la performance des clubs entre 2021-2022 et 2022-2023 ?
-
+### **Question 4 : Quel est l'impact des transferts sur la performance des clubs entre 2021-2022 et 2022-2023 ?**
 
 #### 🎯 Objectif:
+Analyser l'évolution de la performance des clubs entre deux saisons (2021-2022 ➔ 2022-2023) en fonction de leur nombre de recrues durant l'été 2022. L’objectif est de voir s’il existe une corrélation entre le volume de recrutement et l’évolution du classement.
 
-Analyser l'évolution de la performance des clubs entre deux saisons (2021-2022 ➔ 2022-2023) en fonction de leur nombre de recrues durant l'été 2022.
-
-L'objectif est de voir s'il existe une corrélation entre l'activité sur le marché des transferts (quantité de recrutements) et l'évolution du classement d'une saison sur l'autre.
-
+#### 🧪 Hypothèse :
+Nous pensons que les clubs ayant recruté **modérément (4 à 6 joueurs)** progresseront davantage, car ils auront ciblé leurs besoins. Ceux qui ont **recruté massivement** risquent d’avoir des résultats plus hétérogènes à cause du manque de cohésion. Les clubs **n’ayant pas recruté** pourraient stagner ou régresser.
 
 
-```{r}
+
+```{r message=FALSE}
+
 # Regrouper les clubs qui ont recruté et compter
 nb_recrues_club <- transfers_clean %>%
   group_by(club_to) %>%
@@ -335,10 +370,7 @@ evolution_clubs <- classements_2021_2022 %>%
   mutate(
     nb_recrues = replace_na(nb_recrues, 0),  # certains clubs peuvent avoir 0 recrutement
     evolution_classement = classement_2022 - classement_2023
-  )
-
-# Pour la visualisation, créer des classes selon nombre de recrues
-evolution_clubs <- evolution_clubs %>%
+  ) %>%
   mutate(
     categorie_recrutement = case_when(
       nb_recrues == 0 ~ "0 recrue",
@@ -348,19 +380,27 @@ evolution_clubs <- evolution_clubs %>%
     )
   )
 
-# Visualisation : boxplot pour voir la distribution de l'évolution du classement par catégorie de recrutement
+# Visualisation : boxplot avec palette corrigée
 ggplot(evolution_clubs, aes(x = categorie_recrutement, y = evolution_classement, fill = categorie_recrutement)) +
-  geom_boxplot(alpha = 0.7) +
-  scale_fill_manual(values = c("lightblue", "skyblue", "blue", "darkblue")) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_boxplot(alpha = 0.8) +
+  scale_fill_manual(
+    values = c(
+      "0 recrue" = "#f8766d",        
+      "1-3 recrues" = "#f1c40f",     
+      "4-6 recrues" = "#2ecc71",    
+      "7+ recrues" = "#3498db"      
+    )
+  ) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
   labs(
     title = "Impact du recrutement sur l'évolution du classement (2021-2023)",
     subtitle = "Distribution de l'évolution de position en fonction du nombre de recrues estivales",
     x = "Nombre de recrues (catégories)",
-    y = "Evolution du classement (positif = amélioration)",
+    y = "Évolution du classement (positif = amélioration)",
     fill = "Recrutements"
   ) +
-  theme_minimal(base_size = 12)
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "right")
 
 
 ```
@@ -368,19 +408,834 @@ ggplot(evolution_clubs, aes(x = categorie_recrutement, y = evolution_classement,
 
 #### 🧠 Interprétation du graphique:
 
-Le graphique montre la relation entre le nombre de joueurs recrutés par un club durant l’été 2022 et l’évolution de son classement entre les saisons 2021-2022 et 2022-2023.
-L’évolution du classement est calculée en faisant le classement de la saison 2022 moins celui de la saison 2023. Un résultat positif signifie que le club s’est amélioré (il est monté dans le classement), tandis qu’un résultat négatif indique une baisse de performance.
+- 🔵 Les clubs n’ayant recruté aucun joueur présentent des résultats très variables, avec une médiane proche de zéro. Cela suggère qu’en l’absence de renfort, il est difficile de progresser de manière structurée, et que la stabilité seule ne suffit pas toujours.
 
-Globalement dans ce graphique, on observe que :
+- 🔵 Les clubs ayant recruté entre 1 et 3 joueurs semblent en légère régression. Ce type de recrutement limité peut refléter un ajustement insuffisant face aux besoins de l’effectif.
 
-Les clubs qui n'ont recruté aucun joueur ont eu des résultats très variables,ils affichent une médiane proche de zéro, donc peu d'impact.
+- 🔵 En revanche, les clubs ayant recruté entre 4 et 6 joueurs enregistrent en moyenne une amélioration de leur classement. Cela semble indiquer qu’un renforcement ciblé, sans bouleverser l’équilibre collectif, est plus efficace.
 
-Les clubs qui ont recruté entre 1 et 3 joueurs ont plutôt vu leur classement se dégrader (médiane en dessous de 0).
+- 🔵 À l’opposé, les clubs ayant recruté 7 joueurs ou plus affichent une médiane négative et une forte dispersion des résultats. Cela peut s’expliquer par une perte de repères au sein du groupe : remplacer trop de joueurs à la fois nuit à la cohésion et impose de reconstruire l’esprit d’équipe, ce qui peut ralentir les performances sportives.
 
-Les clubs ayant fait 4 à 6 recrues s’en sortent plutôt bien, avec une petite amélioration en moyenne et une médiane légérement supérieure à 0.
+✅ **Conclusion** : L’hypothèse est **largement confirmée** : un recrutement ciblé et mesuré semble plus bénéfique qu’un mercato massif ou une inaction.
 
-Enfin, pour les clubs ayant recruté 7 joueurs ou plus, les résultats sont vraiment très variés : certains ont beaucoup progressé, d’autres ont fortement régressé. La médiane est plutôt négative, ce qui montre que recruter en masse ne garantit pas une amélioration du classement.
+---
 
-En résumé, le graphique montre qu’il n’existe pas de lien clair entre le nombre de recrues et une amélioration du classement. Recruter beaucoup n'est pas toujours efficace, et une stratégie plus ciblée (recruter moins mais mieux) pourrait être plus rentable pour progresser.
+
+### **Question 5 : Quels sont les transferts les plus coûteux de l’été 2022 ? **
+
+#### 🎯 Objectif: 
+Identifier les joueurs ayant fait l’objet des transferts les plus onéreux durant le mercato estival 2022, afin de mieux comprendre où se concentrent les plus gros investissements du marché.
+
+
+#### 🧪 Hypothèse :
+Les attaquants et les jeunes espoirs prometteurs devraient constituer la majorité des transferts les plus chers, notamment en direction des grands clubs européens.
+
+
+
+```{r}
+
+transfers_2022_q5 <- read.csv("data/2022_2023_football_summer_transfers.csv", sep = ",", fileEncoding = "UTF-8")
+
+# Nettoyage des montants
+transferts_top <- transfers_2022_q5 %>%
+  filter(!is.na(fee)) %>%
+  mutate(fee_num = str_extract(fee, "[0-9,.]+"),
+         fee_num = as.numeric(gsub(",", ".", fee_num))) %>%
+  filter(!is.na(fee_num)) %>%
+  arrange(desc(fee_num)) %>%
+  distinct(name, .keep_all = TRUE) %>%
+  slice_max(fee_num, n = 15)
+
+
+# Graphique
+ggplot(transferts_top, aes(x = reorder(name, fee_num), y = fee_num)) +
+  geom_col(fill = "#1f77b4") +
+  coord_flip() +
+  labs(
+    title = "Top 15 des transferts les plus chers – Été 2022",
+    x = "Joueur",
+    y = "Montant du transfert (en millions €)"
+  ) +
+  theme_minimal(base_size = 12)
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+- 🔵 Le graphique met en évidence les 15 plus grosses transactions du mercato d’été 2022.
+
+- 🔵 Une forte majorité des joueurs sont des profils offensifs : attaquants ou milieux créatifs.
+
+- 🔵 On retrouve principalement des clubs disposant d’un fort pouvoir d’achat, issus de la Premier League ou des grands championnats européens.
+
+- 🔵 Les sommes engagées confirment l’importance stratégique de certains postes et le pari sur le potentiel futur des jeunes joueurs.
+
+
+✅ **Conclusion** :  L’hypothèse est confirmée. Les plus grosses dépenses concernent surtout des joueurs offensifs ou très jeunes, recrutés par des clubs ambitieux financièrement. Cela illustre la concentration des investissements sur des profils à fort impact ou à forte valeur de revente.
+
+---
+
+### **Question 6 : Quelle part des buts est marquée par des recrues (top 10) **
+
+#### 🎯 Objectif:
+Mesurer la contribution directe des joueurs recrutés à l’été 2022 dans le total des buts marqués par leur club en 2022-2023.
+
+#### 🧪 Hypothèse :
+Les recrues, devraient représenter une part importante des buts dans les clubs ayant beaucoup investi.
+
+
+
+```{r}
+# Nettoyage des données de transfert
+transfers_cleaned <- transfers_2022 %>%
+  filter(!is.na(club_to), !is.na(name)) %>%
+  distinct(name, club_to)
+
+# Nettoyage et regroupement des joueurs recrutés
+recrues_stats <- player_stats_2021_2022 %>%
+  rename(name = Player, club = Squad, buts = Goals, minutes = Min) %>%
+  mutate(name = str_trim(name)) %>%
+  inner_join(transfers_cleaned, by = "name") %>%
+  filter(!is.na(buts)) %>%
+  group_by(club_to) %>%
+  summarise(buts_recrues = sum(as.numeric(buts), na.rm = TRUE), .groups = "drop")
+
+# Buts totaux par club (2022-2023)
+buts_totaux <- team_stats_2022_2023 %>%
+  rename(club = Squad) %>%
+  select(club, GF)
+
+# Fusion des datasets
+part_buts <- buts_totaux %>%
+  left_join(recrues_stats, by = c("club" = "club_to")) %>%
+  mutate(
+    buts_recrues = replace_na(buts_recrues, 0),
+    part_recrues = buts_recrues / GF
+  ) %>%
+  filter(GF > 0, part_recrues > 0) %>% # on garde uniquement les clubs actifs
+  arrange(desc(part_recrues)) %>%
+  slice_max(part_recrues, n = 10)
+
+# Visualisation en barres horizontales
+ggplot(part_buts, aes(x = reorder(club, part_recrues), y = part_recrues)) +
+  geom_col(fill = "#0072B2") +
+  coord_flip() +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  labs(
+    title = "Part des buts marqués par des recrues (Top 10 clubs)",
+    x = "Club",
+    y = "Part des buts (%)"
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+- 🔵 Le graphique met en valeur les 10 clubs où les recrues ont contribué de manière significative au total des buts.
+
+- 🔵 Cela confirme l’impact potentiel des nouveaux joueurs sur le rendement offensif d’une équipe, surtout en cas de bonne intégration.
+
+✅ **Conclusion** :  L’hypothèse est partiellement confirmée. Dans certains clubs, les recrues ont été déterminantes offensivement. Dans d’autres, leur impact a été plus indirect. La contribution dépend donc fortement du profil des joueurs recrutés et du besoin tactique identifié.
+
+
+
+---
+
+### **Question 7 : Quel est le rendement des recrues vs anciens **
+
+#### 🎯 Objectif:
+Comparer l’efficacité offensive des recrues vs les joueurs déjà présents.
+
+
+
+#### 🧪 Hypothèse :
+Les joueurs déjà intégrés au collectif devraient avoir un meilleur rendement offensif, car les recrues ont souvent besoin de temps pour s’adapter.
+
+
+```{r}
+# Liste des recrues (nom + club)
+recrues <- transfers_2022 %>%
+  filter(!is.na(name)) %>%
+  distinct(name) %>%
+  mutate(statut = "Recrue")
+
+# Données joueurs avec efficacité offensive
+rendement_joueurs <- player_stats_2021_2022 %>%
+  rename(name = Player, buts = Goals, minutes = Min) %>%
+  mutate(name = str_trim(name),
+         buts = as.numeric(buts),
+         minutes = as.numeric(minutes),
+         rendement = buts / minutes) %>%
+  filter(!is.na(rendement), minutes > 200) %>%
+  mutate(statut = ifelse(name %in% recrues$name, "Recrue", "Déjà présent"))
+
+# Visualisation : violin plot du rendement
+ggplot(rendement_joueurs, aes(x = statut, y = rendement, fill = statut)) +
+  geom_violin(trim = FALSE, alpha = 0.7) +
+  geom_boxplot(width = 0.1, color = "black", outlier.shape = NA) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
+  labs(
+    title = "Rendement offensif : Recrues vs Joueurs déjà présents",
+    x = "",
+    y = "Buts par minute jouée"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "none")
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+- 🔵 La forme du violin plot montre la distribution complète du rendement offensif.
+
+- 🔵 Les joueurs déjà présents présentent une distribution plus homogène et une médiane plus élevée.
+
+- 🔵 Les recrues ont un rendement plus variable : certains très efficaces, mais aussi de nombreux cas en dessous de la médiane des anciens.
+
+✅ **Conclusion** :  L’hypothèse est globalement confirmée. Les joueurs déjà présents affichent un meilleur rendement moyen que les recrues, ce qui reflète sans doute une meilleure adaptation au système de jeu. Cependant, certaines recrues affichent des performances remarquables, ce qui montre leur potentiel une fois intégrées.
+
+---
+
+### **Question 8 : Recrutement local vs international? (top 15)**
+
+#### 🎯 Objectif:
+Visualiser la répartition géographique du top 15 des recrutements pour évaluer dans quelle mesure les clubs recrutent localement ou à l’international.
+
+#### 🧪 Hypothèse :
+Les grands clubs européens recrutent principalement à l’international, tandis que les clubs de second rang privilégient les transferts nationaux pour des raisons de coût et de logistique.
+
+
+```{r}
+# Identifier les 15 pays qui ont recruté le plus
+top_pays <- transfers_2022 %>%
+  filter(!is.na(country_to)) %>%
+  count(country_to, name = "nb_total") %>%
+  top_n(15, nb_total) %>%
+  pull(country_to)
+
+# Préparer les données filtrées
+transfers_local_vs_intl <- transfers_2022 %>%
+  filter(!is.na(country_from), !is.na(country_to)) %>%
+  mutate(type = ifelse(country_from == country_to, "National", "International")) %>%
+  count(country_to, type, name = "nb_transferts") %>%
+  filter(country_to %in% top_pays)
+
+# Barplot groupé 
+ggplot(transfers_local_vs_intl, aes(x = reorder(country_to, -nb_transferts), y = nb_transferts, fill = type)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Recrutements nationaux vs internationaux (Top 15 pays – été 2022)",
+    x = "Pays de destination",
+    y = "Nombre de transferts",
+    fill = "Type de transfert"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+- 🔵 Certains pays comme l’Allemagne ou l’Espagne ont un bon équilibre entre local et international.
+
+- 🔵 Les clubs des championnats secondaires recrutent davantage localement, contrairement aux clubs anglais ou italiens.
+
+
+✅ **Conclusion** :  L’hypothèse est confirmée. Le recrutement international est prépondérant dans les grands championnats, mais des flux internes nationaux importants subsistent dans certains pays. La carte des transferts illustre une géopolitique du football bien ancrée.
+
+---
+
+### **Question 9 : Quels clubs misent sur des jeunes joueurs ?**
+
+#### 🎯 Objectif:
+
+Identifier les clubs qui intègrent le plus de jeunes joueurs dans leur effectif et leur donnent du temps de jeu.
+
+#### 🧪 Hypothèse :
+
+Certains clubs, notamment ceux ayant une stratégie axée sur la formation ou la revente de joueurs (comme RB Salzburg, l'Ajax ou Barcelone), misent davantage sur les jeunes talents, tant en nombre qu’en minutes jouées. On peut également s’attendre à observer une forte présence de jeunes joueurs dans les clubs des championnats français et espagnol, ces pays disposant de viviers de talents particulièrement importants et n'hésite pas à former de jeunes joueurs. Par ailleurs, les clubs disposant de moyens financiers plus limités ont souvent tendance à faire davantage confiance aux jeunes joueurs, qui représentent une alternative plus économique
+
+```{r}
+
+# Filtrer les jeunes joueurs 
+jeunes_joueurs <- player_stats_2021_2022  %>%
+  filter(Age < 22)
+
+# Compter le nombre de jeunes joueurs par club
+jeunes_par_club <- jeunes_joueurs %>%
+  count(Squad, name = "nb_jeunes") %>%
+  arrange(desc(nb_jeunes)) %>%
+  top_n(10, nb_jeunes)
+
+# Barplot horizontal
+ggplot(jeunes_par_club, aes(x = reorder(Squad, nb_jeunes), y = nb_jeunes)) +
+  geom_col(fill = "#66BB6A", width = 0.6) +  
+  geom_text(aes(label = nb_jeunes), hjust = -0.1, size = 4, color = "black") +
+  coord_flip(clip = "off") +
+  labs(
+    title = "Top 10 des clubs avec le plus de jeunes joueurs (< 22 ans)\nSaison 2021/22",
+    x = NULL,
+    y = "Nombre de jeunes joueurs"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    axis.text.y = element_text(face = "bold"),
+    axis.text.x = element_text(color = "gray30"),
+    panel.grid.major.y = element_blank(),  
+    panel.grid.minor = element_blank(),
+    plot.margin = margin(10, 20, 10, 10) 
+  ) +
+  ylim(0, max(jeunes_par_club$nb_jeunes) + 2)  
+
+```
+
+```{r}
+# Filtrer les jeunes joueurs (<23 ans)
+jeunes_joueurs <- player_stats_2021_2022 %>%
+  filter(Age < 23)
+
+# Calculer le total des minutes jouées par club (par les jeunes joueurs)
+minutes_par_club <- jeunes_joueurs %>%
+  group_by(Squad) %>%
+  summarise(total_minutes = sum(Min, na.rm = TRUE)) %>%
+  arrange(desc(total_minutes)) %>%
+  slice_head(n = 10)  # Top 10 clubs
+
+# Lollipop plot
+ggplot(minutes_par_club, aes(x = reorder(Squad, total_minutes), y = total_minutes)) +
+  geom_segment(aes(xend = Squad, y = 0, yend = total_minutes), color = "#4CAF50", size = 1.2) +
+  geom_point(color = "#FBC02D", size = 6) +
+  coord_flip() +
+  labs(
+    title = "Total des minutes jouées par les jeunes joueurs\npar club sur la saison 2021/22",
+    x = "Club",
+    y = "Minutes jouées"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    axis.text.y = element_text(face = "bold"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+
+```
+
+#### 🧠 Interprétation des graphiques:
+
+
+- 🔵 Certains clubs réputés pour leur formation — **FC Barcelone**, **Borussia Dortmund**, **Bayer Leverkusen** — offrent un temps de jeu conséquent à leurs jeunes joueurs.
+
+- 🔵 La **Ligue 1** se distingue nettement : **6 clubs dans le top 15** en nombre de jeunes joueurs utilisés, **4 dans le top 10** en minutes jouées. Cela confirme une forte culture de formation et une intégration rapide des jeunes dans les effectifs.
+
+- 🔵 La **Liga espagnole** est moins représentée que prévu, avec seulement deux clubs dans le top 15. Le **FC Barcelone** reste une exception forte, incarnant une politique claire de valorisation interne.
+
+- 🔵 Certains clubs comme **Reims**, **Bologne** ou **Valence** allient jeunesse de l’effectif et temps de jeu élevé pour ces joueurs, confirmant une stratégie de développement assumée.
+
+- 🔵 Aucun lien direct n’émerge entre le **budget** et l’**utilisation des jeunes** : même les clubs les plus riches (**PSG**, **Milan AC**, **Barça**) misent fortement sur leur centre de formation. Cela montre que la formation est un levier stratégique, au-delà des moyens financiers.
+
+
+
+✅ **Conclusion** :L’hypothèse est donc globalement confirmée : les clubs avec une stratégie de formation claire jouent davantage leurs jeunes talents, comme en témoignent les chiffres en nombre de joueurs et en minutes jouées. Cependant, la diversité des situations montre que ce n’est pas uniquement une question de moyens financiers, mais surtout d’efficacité des centres de formation et de la politique sportive adoptée. Cette analyse souligne donc l’importance de la formation comme facteur clé de succès pour les clubs souhaitant valoriser leurs jeunes joueurs sur le long terme
+
+---
+
+### **Question 10 : Quelles équipes sont les plus "chanceuses" ou "malchanceuses" ? **
+
+#### 🎯 Objectif:
+Identifier les équipes dont le nombre de buts marqués est significativement supérieur ou inférieur à leur expected goals (xG) sur la saison 2021/2022. Cela permet de mettre en évidence celles qui dépassent les attentes en convertissant efficacement leurs occasions (équipes « chanceuses »), et celles qui, malgré beaucoup d’occasions créées (xG élevé), peinent à concrétiser (équipes « malchanceuses »). On ne se basera que sur les grands championnats pour essayer d'établir une corrélation avec la place dans le classement cette année la.
+
+
+#### 🧪 Hypothèse :
+
+Il paraît plausible que les équipes les mieux classées dans leur championnat ont tendance à être « chanceuses », c’est-à-dire qu’elles marquent plus de buts que ce que leur expected goals (xG) prédit, grâce à une meilleure finition et une efficacité offensive supérieure. En revanche, les équipes moins bien classées que ce qu'elle devrait, malgré un xG parfois élevé, peinent à convertir leurs occasions, ce qui les rend « malchanceuses » et reflète un manque de réalisme devant le but ou une qualité individuelle moindre.
+
+
+
+```{r}
+# On ajoute une colonne GF - xG (buts réels moins buts attendus)
+team_stats_2021_2022$delta_goals <- team_stats_2021_2022$GF - team_stats_2021_2022$xG
+
+top_chanceuses <- team_stats_2021_2022 %>%
+  arrange(desc(delta_goals)) %>%
+  slice_head(n = 10)
+
+ggplot(top_chanceuses, aes(x = reorder(Squad, delta_goals), y = delta_goals)) +
+  geom_col(fill = "#4CAF50", width = 0.6) +
+  coord_flip(clip = "off") + 
+  labs(
+    title = "Top 10 équipes 'chanceuses' en 2021/2022",
+    subtitle = "Équipes ayant marqué plus de buts que leurs xG attendus",
+    x = "Équipe",
+    y = "Différence buts réels - xG"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+    plot.subtitle = element_text(hjust = 0.5, size = 11, face = "italic"),
+    axis.title.x = element_text(face = "bold", size = 10),
+    axis.title.y = element_text(face = "bold", size = 11),
+    axis.text.y = element_text(face = "bold"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.margin = margin(10, 30, 10, 10)
+  )
+
+
+
+
+```
+
+```{r}
+# Top 10 équipes "malchanceuses" (delta_goals négatif le plus bas)
+top_malchanceuses <- team_stats_2021_2022 %>%
+  arrange(delta_goals) %>%
+  slice_head(n = 10)
+
+ggplot(top_malchanceuses, aes(x = reorder(Squad, delta_goals), y = delta_goals)) +
+  geom_col(fill = "#D32F2F", width = 0.6) +
+  coord_flip(clip = "off") +
+  labs(
+    title = "Top 10 équipes 'malchanceuses' en 2021/2022",
+    subtitle = "Équipes avec un xG élevé mais peu de buts marqués",
+    x = "Équipe",
+    y = "Différence buts réels - xG"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+    plot.subtitle = element_text(hjust = 0.5, size = 11, face = "italic"),
+    axis.title.x = element_text(face = "bold", size = 10),
+    axis.title.y = element_text(face = "bold", size = 11),
+    axis.text.y = element_text(face = "bold"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.margin = margin(10, 30, 10, 10)
+  )
+
+
+
+```
+
+#### 🧠 Interprétation du graphique:
+
+- 🔵 Une corrélation apparaît entre les équipes "chanceuses" (ayant marqué plus de buts que leurs xG) et leur performance en championnat.
+
+- 🔵 Parmi ces équipes : **Dortmund (2ᵉ Bundesliga)**, **Lazio (5ᵉ Serie A)**, **Rennes (4ᵉ Ligue 1)**, **Leverkusen (3ᵉ Bundesliga)**, **Naples (3ᵉ Serie A)** et **PSG (champion de Ligue 1)**. Hormis les très grands clubs comme le PSG, ces équipes ont souvent réalisé l’une de leurs meilleures saisons.
+
+- 🔵 Des clubs comme **Hellas Vérone (9ᵉ en Serie A cette saison-là, 17ᵉ la suivante)** ou **Nantes (9ᵉ en Ligue 1, contre 18ᵉ puis 17ᵉ les saisons encadrantes)** témoignent également de performances supérieures à leur niveau habituel, suggérant une **saison de surperformance**.
+
+- 🔵 À l’inverse, les équipes "malchanceuses" (xG élevés mais peu de buts marqués) sont souvent bien classées : **Real Sociedad (6ᵉ)**, **Genoa (11ᵉ)**, **Lorient (10ᵉ)**, **Athletic Club (8ᵉ)**, **Clermont (8ᵉ)**, **Rayo Vallecano (12ᵉ)**, **Wolfsburg (12ᵉ)**. Leur bon classement s'explique par une capacité à se créer de nombreuses occasions, sans les concrétiser pleinement.
+
+- 🔵 Enfin, des équipes comme **Norwich** ou **Alavés**, derniers de leurs championnats, montrent que la "malchance" ne suffit pas toujours à expliquer les résultats : certaines saisons sont simplement ratées dans leur ensemble.
+
+
+✅ **Conclusion** :  
+
+Les équipes "chanceuses", qui marquent plus que leurs expected goals (xG), sont souvent bien classées et en surperformance. À l'inverse, certaines équipes "malchanceuses" restent compétitives malgré un manque d'efficacité offensive. L'écart entre buts et xG influence le classement, mais ne l'explique pas entièrement.
+
+---
+
+### **Question 11 : Les clubs ayant recruté plus de joueurs ont-ils mieux performé ? **
+
+#### 🎯 Objectif:
+Étudier s’il existe une relation entre le nombre de recrues lors du mercato estival 2022 et l’évolution des performances sportives des clubs entre 2021-2022 et 2022-2023.
+
+#### 🧪 Hypothèse :
+Nous formulons l’hypothèse que chaque défenseur excelle dans un type d’intervention défensive qui correspond à :son style de jeu personnel,les besoins spécifiques de son équipe, ou encore aux caractéristiques du championnat dans lequel il évolue.
+Par exemple, un joueur comme Virgil van Dijk pourrait exceller dans les duels aériens en raison du rythme physique de la Premier League, tandis que David Alaba aurait un profil plus polyvalent ou technique adapté au style de jeu du Real Madrid en Liga.
+
+
+```{r}
+
+# Sélection des joueurs représentatifs par championnat
+joueurs <- c("Virgil van Dijk", "Marquinhos", "Kalidou Koulibaly", "David Alaba")
+
+# Création des indicateurs normalisés par 90 minutes
+defenseurs <- player_stats_2021_2022 %>%
+  filter(Player %in% joueurs, X90s > 5) %>%
+  mutate(
+    Tacles90 = Tkl / X90s,
+    Interceptions90 = Int / X90s,
+    DuelsAerienPct = AerWon.,
+    Blocs90 = Blocks / X90s,
+    Degagements90 = Clr / X90s
+  ) %>%
+  select(Player, Tacles90, Interceptions90, DuelsAerienPct, Blocs90, Degagements90) %>%
+  column_to_rownames("Player")
+
+# Ajouter lignes max / min pour fmsb
+radar_def <- rbind(
+  apply(defenseurs, 2, max),
+  apply(defenseurs, 2, min),
+  defenseurs
+)
+
+# Renommer les colonnes pour plus de clarté
+colnames(radar_def) <- c(
+  "Tacles/90m",
+  "Interceptions/90m",
+  "Duels aériens (%)",
+  "Blocs/90m",
+  "Dégagements/90m"
+)
+
+# Réduction des marges et affichage radar
+par(mar = c(2, 2, 2, 2))
+
+# Couleurs améliorées (Alaba passe en violet foncé)
+radarchart(
+  radar_def,
+  axistype = 1,
+  pcol = c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3"),  # rouge, bleu, vert, violet
+  pfcol = c("#E41A1C50", "#377EB850", "#4DAF4A50", "#984EA350"),
+  plwd = 2,
+  cglcol = "grey",
+  cglty = 1,
+  axislabcol = "grey",
+  vlcex = 0.9,
+  title = "Profil défensif des meilleurs défenseurs par championnat (2021-2022)"
+)
+
+legend(
+  "topright",
+  legend = rownames(defenseurs),
+  col = c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3"),
+  lty = 1,
+  lwd = 2,
+  bty = "n"
+)
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+- 🔵 Le radar chart permet de comparer les performances de Virgil van Dijk (Premier League), Marquinhos (Ligue 1), Kalidou Koulibaly (Serie A) et David Alaba (La Liga), chacun représenté par une couleur distincte.
+
+- 🔵 Van Dijk domine nettement les duels aériens, ce qui confirme son rôle de tour de contrôle défensive au sein de Liverpool et son importance dans le jeu aérien.
+
+- 🔵 Marquinhos présente un profil très équilibré, avec des performances solides sur l’ensemble des dimensions défensives, reflétant sa régularité et sa polyvalence au PSG.
+
+- 🔵 Koulibaly se distingue particulièrement par son volume de dégagements et de blocs, traduisant une approche défensive réactive, physique et axée sur l’interruption du jeu adverse.
+
+- 🔵 Alaba, en revanche, affiche un profil moins basé sur l’impact physique ; ses statistiques reflètent davantage son rôle hybride entre défenseur et milieu dans un système de possession comme celui du Real Madrid.
+
+✅ **Conclusion** :  
+
+Cette visualisation met en lumière la diversité des profils défensifs au plus haut niveau européen. Chaque joueur excelle dans des dimensions différentes, illustrant que la performance défensive ne se limite pas à une seule statistique, mais dépend de l’environnement tactique, du style d’équipe et du championnat. Le radar chart est ici un outil efficace pour identifier les points forts et les spécialisations de chacun, tout en offrant une représentation synthétique d’indicateurs hétérogènes mais complémentaires.
+
+---
+
+### **Question 12 : Quels clubs sont les plus dépendants de leur meilleur buteur ?**
+
+#### 🎯 Objectif: 
+Évaluer dans quelle mesure chaque club dépend de son meilleur buteur pour marquer des buts lors de la saison 2021-2022.
+
+
+
+#### 🧪 Hypothèse :
+Certains clubs dépendent fortement d’un seul joueur pour marquer des buts. Cette dépendance peut poser un risque stratégique (blessure, transfert, méforme).
+
+
+
+```{r}
+# Extraction depuis la colonne unique "Buteur"
+team_stats_2021_2022 <- team_stats_2021_2022 %>%
+  mutate(
+    Nb_buts_buteur = str_extract(Top.Team.Scorer, "\\d+$"),            
+    Buteur = str_remove(Top.Team.Scorer, "\\s*-\\s*\\d+$"),             
+    Nb_buts_buteur = as.numeric(Nb_buts_buteur),
+    dep_buteur = Nb_buts_buteur / GF
+  )
+
+# Top 10 des clubs les plus dépendants
+top_dependance <- team_stats_2021_2022 %>%
+  filter(!is.na(dep_buteur)) %>%
+  arrange(desc(dep_buteur)) %>%
+  slice_head(n = 10)
+
+# Visualisation
+ggplot(top_dependance, aes(x = reorder(Squad, dep_buteur), y = dep_buteur)) +
+  geom_col(fill = "#0072B2") +
+  coord_flip() +
+  labs(
+    title = "Top 10 des clubs les plus dépendants à leur meilleur buteur (2021-2022)",
+    x = "Club",
+    y = "Part des buts marqués par le meilleur buteur"
+  ) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  theme_minimal()
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+- 🔵 Le graphique illustre la part des buts marqués par le meilleur buteur de chaque club, mettant en évidence leur dépendance offensive à un seul joueur.
+
+- 🔵 Getafe est l’équipe la plus dépendante, avec près de 48 % de ses buts inscrits par Enes Ünal, suivi de Norwich City, dont Teemu Pukki a marqué également 48 % des buts du club.
+
+- 🔵 Des clubs comme Alavés ou Espanyol affichent eux aussi une forte dépendance offensive, dépassant le seuil de 40 % de buts venant d’un seul joueur.
+
+- 🔵 Ce niveau de concentration du scoring rend ces équipes vulnérables : l’absence ou la méforme de leur buteur principal peut fortement pénaliser leur efficacité offensive globale.
+
+
+✅ **Conclusion** :  
+Ce graphique met en évidence que certains clubs reposent quasiment à moitié sur un seul joueur pour marquer. Cela suggère une dépendance tactique risquée, qui devrait être prise en compte dans la stratégie sportive (recrutement, distribution du jeu, etc.).
+À l’inverse, les clubs avec une dépendance plus faible bénéficient d’un jeu offensif plus collectif, souvent plus résilient à l’échelle d’une saison.
+
+---
+
+### **Question 13 : Les investissements ont-ils amélioré les résultats sportifs ? **
+
+#### 🎯 Objectif:
+Analyser s’il existe une relation entre les montants investis par les clubs pendant le mercato estival 2022 et leur évolution en termes de points entre les saisons 2021-2022 et 2022-2023.
+
+
+#### 🧪 Hypothèse :
+Les clubs ayant dépensé davantage lors du mercato estival 2022 ont obtenu de meilleurs résultats sportifs la saison suivante.
+
+```{r}
+# Nettoyage de la variable "fee" (valeur du transfert)
+transfers_clean <- transfers_2022 %>%
+  filter(!fee %in% c("Free", "Loan", "", NA)) %>%
+  mutate(fee = str_remove_all(fee, "€|m|\\s"),
+         fee = as.numeric(fee))  # en millions d’euros
+
+# Calcul des investissements totaux par club d’arrivée
+investissements <- transfers_clean %>%
+  group_by(club_to) %>%
+  summarise(invest_total = sum(fee, na.rm = TRUE))
+
+# Préparer la table avec variation de points
+variation_points <- team_stats_2022_2023 %>%
+  select(Squad, Pts) %>%
+  rename(club_to = Squad, Pts_22_23 = Pts) %>%
+  left_join(select(team_stats_2021_2022, Squad, Pts), by = c("club_to" = "Squad")) %>%
+  rename(Pts_21_22 = Pts) %>%
+  mutate(variation_pts = Pts_22_23 - Pts_21_22)
+
+# Fusion des données
+df_invest <- left_join(variation_points, investissements, by = "club_to") %>%
+  filter(!is.na(invest_total))
+
+# Graphique : régression + intervalle de confiance
+ggplot(df_invest, aes(x = invest_total, y = variation_pts)) +
+  geom_point(size = 3, alpha = 0.7, color = "#E69F00") +
+  geom_smooth(
+    method = "lm",
+    se = TRUE,
+    level = 0.50,  
+    color = "black",
+    fill = "grey70",
+    alpha = 0.4,
+    linetype = "dashed"
+  ) +
+  labs(
+    title = "Lien entre investissement estival et progression en points",
+    x = "Montant investi (en millions €)",
+    y = "Évolution du nombre de points"
+  ) +
+  theme_minimal()
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+- 🔵 Le graphique met en relation le montant investi par chaque club lors du mercato estival 2022 avec la variation de points obtenue entre les saisons 2021-2022 et 2022-2023.
+
+- 🔵 Chaque point représente un club, avec l’axe horizontal indiquant le montant total investi (en M€), et l’axe vertical montrant l’évolution du nombre de points sur une saison.
+
+- 🔵 La droite de régression affiche une légère pente négative, suggérant qu’en moyenne, les clubs les plus dépensiers n’ont pas forcément progressé en termes de résultats sportifs.
+
+
+
+✅ **Conclusion** :  
+
+Cette visualisation suggère que les investissements élevés ne se traduisent pas systématiquement par une amélioration des résultats sportifs.
+Au contraire, la tendance observée dans notre échantillon montre une corrélation légèrement négative entre les montants investis et la progression en points.
+Ce résultat met en évidence que le budget seul ne suffit pas : la qualité du recrutement, l’intégration des joueurs, la stratégie de jeu ou encore la stabilité de l’effectif peuvent jouer un rôle plus important que la dépense brute.
+---
+
+### **Question 14 : Quels sont les meilleurs milieux de terrain en termes de création ?**
+
+#### 🎯 Objectif:
+Identifier les milieux de terrain les plus créatifs lors de la saison 2021-2022 en combinant plusieurs indicateurs : passes clés, passes décisives, passes dans la surface, et passes menant à des tirs.
+
+
+
+#### 🧪 Hypothèse :
+Un milieu créatif ne se limite pas aux passes décisives. Les meilleurs créateurs sont ceux qui préparent les occasions, pénètrent dans les zones dangereuses et participent activement à la construction offensive.
+
+
+```{r}
+# Sélection des milieux ayant joué au moins 10 matchs et disponibles dans les bonnes colonnes
+milieux <- player_stats_2021_2022 %>%
+  filter(Pos %in% c("MF", "CM", "DM", "AM")) %>%
+  filter(MP >= 10) %>%
+  select(Player, Squad, Pos, MP, Assists, PasAss, PPA, ScaPassLive) %>%
+  mutate(note_creation = (Assists + PasAss + PPA + ScaPassLive) / MP) %>%
+  arrange(desc(note_creation)) %>%
+  slice_head(n = 10)
+ggplot(milieux, aes(x = reorder(Player, note_creation), y = note_creation, fill = Squad)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Top 10 des milieux les plus créatifs (2021-2022)",
+    x = "Joueur",
+    y = "Indice de création par match"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+- 🔵 L’indice présenté combine quatre dimensions clés de la création offensive : Assists (passes décisives), PasAss (passes clés), PPA (passes vers la surface), et ScaPassLive (passes en jeu menant à un tir).
+
+- 🔵 En rapportant ces données au nombre de matchs joués, on obtient un indice normalisé, ce qui permet une comparaison équitable entre joueurs, quelle que soit leur durée de jeu.
+
+- 🔵 Cet indice offre une vision globale de la contribution offensive par la passe, en allant au-delà des seules passes décisives pour inclure la préparation des actions dangereuses.
+
+✅ **Conclusion** :  
+
+Cette approche met en lumière les milieux les plus impliqués dans la création offensive, qu’ils soient passeurs décisifs, régulateurs du jeu ou moteurs de la progression du ballon.
+Elle montre que la créativité ne se limite pas aux passes décisives visibles, mais aussi à la construction d’occasions, essentielle au jeu moderne.
+
+---
+
+### **Question 15 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 16 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 17 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 18 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 19 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
+---
+
+### **Question 20 : **
+
+#### 🎯 Objectif:
+
+
+#### 🧪 Hypothèse :
+
+
+
+```{r}
+
+```
+
+
+#### 🧠 Interprétation du graphique:
+
+
+✅ **Conclusion** :  
+
 
 
