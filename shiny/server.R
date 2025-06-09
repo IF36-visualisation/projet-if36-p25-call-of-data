@@ -4,12 +4,13 @@ library(dplyr)
 library(ggplot2)
 library(DT)
 library(stringr)
+library(plotly)
 
 # 💾 Importation des données (équivalent au chunk Rmd)
 player_stats_2021_2022 <- read.csv("../data/2021-2022 Football Player Stats.csv", sep = ";", fileEncoding = "ISO-8859-1")
 team_stats_2021_2022   <- read.csv("../data/2021-2022 Football Team Stats.csv", sep = ";", fileEncoding = "ISO-8859-1")
 team_stats_2022_2023   <- read.csv("../data/2022-2023 Football Team Stats.csv", sep = ";", fileEncoding = "ISO-8859-1")
-transfers_2022         <- read.csv("../data/2022_2023_football_summer_transfers.csv", sep = ",", fileEncoding = "ISO-8859-1")
+transfers_2022         <- read.csv("../data/2022_2023_football_summer_transfers.csv", sep = ",", fileEncoding = "UTF-8")
 
 # Nettoyage des données de transfert (comme vu précédemment)
 transfers_clean <- transfers_2022 %>%
@@ -17,18 +18,24 @@ transfers_clean <- transfers_2022 %>%
   mutate(fee_num = as.numeric(str_remove_all(fee, "[^0-9.]"))) %>%
   mutate(fee_num = ifelse(is.na(fee_num), 0, fee_num))
 
+transfers_2022$league_from <- sub("^\uFEFF", "", transfers_2022$league_from)
+
 
 server <- function(input, output, session) {
   
   # Mise à jour dynamique des filtres dans la sidebar
   updateSelectInput(session, "ligueFilter", choices = sort(unique(transfers_clean$league_from)))
-  updateSelectInput(session, "countryFilter", choices = sort(unique(transfers_clean$country_from)))
-  
+
   # Top ligues par nombre de transferts (pour limiter le premier graphique)
   top_ligues <- transfers_clean %>%
     count(league_from, sort = TRUE) %>%
     slice_head(n = 15) %>%
     pull(league_from)
+  
+  # Corriger l'encodage
+  top_ligues <- iconv(top_ligues, from = "", to = "UTF-8")
+  
+  updateSelectInput(session, "ligueFilter", choices = sort(top_ligues))
   
   # Filtrage pour le graphique de volume (top ligues seulement)
   filtered_volume <- reactive({
@@ -40,7 +47,7 @@ server <- function(input, output, session) {
     df
   })
   
-  output$volumePlot <- renderPlot({
+  output$volumePlot <- renderPlotly({
     df <- filtered_volume() %>%
       group_by(league_from) %>%
       summarise(nb_transferts = n()) %>%
@@ -61,7 +68,7 @@ server <- function(input, output, session) {
       group_by(league_from) %>%
       summarise(Nombre_de_transferts = n()) %>%
       arrange(desc(Nombre_de_transferts))
-    datatable(df, options = list(pageLength = 10))
+    datatable(df, options = list(pageLength = 10,lengthChange = FALSE))
   })
   
   filtered_valeur <- reactive({
@@ -75,7 +82,7 @@ server <- function(input, output, session) {
     df
   })
   
-  output$valeurPlot <- renderPlot({
+  output$valeurPlot <- renderPlotly({
     df <- filtered_valeur() %>%
       group_by(country_from, league_from) %>%
       summarise(valeur_totale = sum(fee_num, na.rm = TRUE)) %>%

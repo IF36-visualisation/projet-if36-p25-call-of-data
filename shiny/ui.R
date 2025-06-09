@@ -1,6 +1,7 @@
 library(shiny)
 library(shinydashboard)
 library(DT)
+library(plotly)
 
 ui <- dashboardPage(
   dashboardHeader(title = "Analyse des transferts été 2022", titleWidth = 300),
@@ -19,7 +20,7 @@ ui <- dashboardPage(
     tabItems(
       tabItem(tabName = "volume",
               h2("Volume des transferts par ligue de départ"),
-              plotOutput("volumePlot"),
+              plotlyOutput("volumePlot"),
               br(),
               DTOutput("volumeTable")
       ),
@@ -34,7 +35,7 @@ ui <- dashboardPage(
                   checkboxInput("logScale", "Échelle logarithmique pour la valeur", value = TRUE)
                 ),
                 mainPanel(
-                  plotOutput("valeurPlot"),
+                  plotlyOutput("valeurPlot"),
                   br(),
                   DTOutput("valeurTable")
                 )

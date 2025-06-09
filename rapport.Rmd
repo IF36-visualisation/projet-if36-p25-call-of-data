@@ -1119,31 +1119,29 @@ Elle montre que la créativité ne se limite pas aux passes décisives visibles,
 ### **Question 15 : Volume des transferts par ligue de départ ** 
 
 #### 🎯 Objectif:
-Analyser quel championnat (ligue) est à l’origine du plus grand nombre de transferts durant l’été 2022. Cette analyse permet de comprendre les ligues les plus exportatrices de joueurs et d’identifier les marchés de talents actifs.
+Analyser quel championnat (ligue) est à l’origine du plus grand nombre de transferts durant l’été 2022. Cela aide à repérer les championnats qui forment beaucoup de joueurs ou qui ont une stratégie de vente active.
 
 #### 🧪 Hypothèse :
-Les ligues les plus réputées financièrement (ex : Premier League, Liga, Bundesliga) exportent plus de joueurs, mais certains championnats moins connus peuvent aussi être des pourvoyeurs importants de jeunes talents.
+Les ligues les plus réputées financièrement (ex : Premier League, Liga, Bundesliga) exportent plus de joueurs, mais certains championnats moins connus (Amérique du Sud) peuvent aussi être des promoteurs importants de jeunes talents.
 
+#### 🧠 Interprétation du graphique:
+Le graphique montre les 15 premières ligues (hors 2e et 3e divisions) classées selon leur nombre de joueurs transférés.
+On remarque que les 5 grands championnats sont en haut du classement comme prévu mais étonnemment la ligue turque ou même la ligue 2 française ont un nombre de transferts plus élevé que la ligue brésilienne. Cela peut provenir du fait qu'à cette année il y'a eu manque de talents provenants de ces pays.
 
 ```{r}
 
 ```
 
-
-#### 🧠 Interprétation du graphique:
-
-
-✅ **Conclusion** :  
 
 ---
 
 ### **Question 16 : Valeur marchande des transferts selon pays et ligue de départ**
 
 #### 🎯 Objectif:
-Analyser la répartition de la valeur totale des transferts selon le pays et la ligue d’origine des joueurs. Cela permet de mieux comprendre où se concentrent les investissements financiers et d’identifier les marchés les plus lucratifs.
+Analyser la répartition de la valeur totale des transferts selon le pays et la ligue d’origine des joueurs. Cela permet de mieux comprendre où les clubs arrivent à faire de bons retour sur investissement et d’identifier les marchés les plus chers.
 
 #### 🧪 Hypothèse :
-Les pays et ligues les plus riches ou les plus attractifs devraient générer des transferts avec des valeurs plus élevées. On s’attend donc à une concentration forte sur quelques ligues majeures.
+Les pays et ligues les plus riches ou les plus attractifs devraient générer des transferts avec des valeurs plus élevées. On s’attend donc à une concentration forte sur quelques ligues majeures (le top 5 ligues européennes).
 
 
 ```{r}
@@ -1152,7 +1150,7 @@ Les pays et ligues les plus riches ou les plus attractifs devraient générer de
 
 
 #### 🧠 Interprétation du graphique:
-- 🔵 Le graphique illustre clairement que certaines ligues et pays dominent le marché par la valeur financière des transferts.
+- 🔵 Le graphique illustre clairement que certaines ligues et pays (comme énoncé dans l'hypothèse, le top 5 ligues Euro) dominent le marché par la valeur financière des transferts.
 
 - 🔵 L’échelle logarithmique permet de bien voir les différences entre ligues majeures et mineures.
 
@@ -1160,7 +1158,7 @@ Les pays et ligues les plus riches ou les plus attractifs devraient générer de
 
 
 ✅ **Conclusion** :  
-Les investissements sont concentrés dans un petit nombre de ligues majeures, confirmant l’hypothèse. Cette analyse financière complète l’analyse quantitative du volume des transferts.
+Les investissements sont concentrés dans un petit nombre de ligues majeures, confirmant l’hypothèse. Cette analyse financière complète l’analyse quantitative du volume des transferts. Cela confirme que les grands championnats ont un pouvoir de négociation bien plus fort. On voit aussi que la valeur d’un joueur ne dépend pas uniquement de son talent, mais aussi de son championnat d’origine et de sa visibilité médiatique.
 
 
 ---
