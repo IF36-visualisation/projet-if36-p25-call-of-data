@@ -1109,6 +1109,7 @@ ggplot(milieux, aes(x = reorder(Player, note_creation), y = note_creation, fill 
 
 - 🔵 Cet indice offre une vision globale de la contribution offensive par la passe, en allant au-delà des seules passes décisives pour inclure la préparation des actions dangereuses.
 
+
 ✅ **Conclusion** :  
 
 Cette approche met en lumière les milieux les plus impliqués dans la création offensive, qu’ils soient passeurs décisifs, régulateurs du jeu ou moteurs de la progression du ballon.
@@ -1124,13 +1125,18 @@ Analyser quel championnat (ligue) est à l’origine du plus grand nombre de tra
 #### 🧪 Hypothèse :
 Les ligues les plus réputées financièrement (ex : Premier League, Liga, Bundesliga) exportent plus de joueurs, mais certains championnats moins connus (Amérique du Sud) peuvent aussi être des promoteurs importants de jeunes talents.
 
+![](data/image/Shiny2.png){width=100%} 
+
+
 #### 🧠 Interprétation du graphique:
-Le graphique montre les 15 premières ligues (hors 2e et 3e divisions) classées selon leur nombre de joueurs transférés.
-On remarque que les 5 grands championnats sont en haut du classement comme prévu mais étonnemment la ligue turque ou même la ligue 2 française ont un nombre de transferts plus élevé que la ligue brésilienne. Cela peut provenir du fait qu'à cette année il y'a eu manque de talents provenants de ces pays.
 
-```{r}
+- 🔵 Le graphique présente les 15 premières ligues (hors 2e et 3e divisions) classées selon le nombre de joueurs transférés à l'été 2022.
 
-```
+- 🔵 Comme attendu, les 5 grands championnats européens figurent en tête, confirmant leur rôle central dans le marché des transferts.
+
+
+✅ **Conclusion** :  
+Le poste du joueur influence clairement sa valeur, avec une prédominance des attaquants sur le marché. De plus, certaines ligues moins médiatisées peuvent surprendre par leur volume de transferts, révélant des dynamiques locales ou conjoncturelles spécifiques.
 
 
 ---
@@ -1143,13 +1149,11 @@ On remarque que les 5 grands championnats sont en haut du classement comme prév
 #### 🧪 Hypothèse :
 Les pays et ligues les plus riches ou les plus attractifs devraient générer des transferts avec des valeurs plus élevées. On s’attend donc à une concentration forte sur quelques ligues majeures (le top 5 ligues européennes).
 
-
-```{r}
-
-```
+![](data/image/Shiny1.png){width=100%} 
 
 
 #### 🧠 Interprétation du graphique:
+
 - 🔵 Le graphique illustre clairement que certaines ligues et pays (comme énoncé dans l'hypothèse, le top 5 ligues Euro) dominent le marché par la valeur financière des transferts.
 
 - 🔵 L’échelle logarithmique permet de bien voir les différences entre ligues majeures et mineures.
@@ -1162,90 +1166,108 @@ Les analyses quantitatives (volume de transferts) et financières (valeur des tr
 
 
 
-
 ---
 
-### **Question 17 : **
+### **Question 17 : Quel pays a accueilli le plus de joueurs coûteux durant le mercato d'été 2022 ? **
 
-#### 🎯 Objectif:
+#### 🎯 Objectif: 
+Identifier les pays qui attirent le plus de joueurs en termes de volume financier
 
 
 #### 🧪 Hypothèse :
+Les clubs Europeens attirent plus de joueurs que ceux d’autres pays grâce à leur pouvoir d’achat élevé
 
-
-
-```{r}
-
-```
-
+![](data/image/Capture Carte.png){width=100%} 
 
 #### 🧠 Interprétation du graphique:
 
+- 🔵 La carte permet d’identifier rapidement les pays européens ayant investi le plus dans les transferts de joueurs durant l’année 2022.
+
+- 🔵 Les principaux contributeurs sont clairement visibles : Angleterre, France, Espagne, Allemagne et Italie se démarquent par la taille de leurs cercles, indiquant une forte capacité financière.
+
+- 🔵 À l’inverse, des pays comme la Suisse, la Croatie ou le Portugal affichent des montants bien plus modestes, illustrant un écart important entre les puissances footballistiques.
+
+- 🔵 Ce graphique confirme l’hypothèse selon laquelle les grands championnats européens dominent le marché des transferts en termes de dépenses, bien que certains pays plus modestes restent actifs.
 
 ✅ **Conclusion** :  
+Les dépenses de transferts en 2022 confirment la domination des grandes puissances européennes du football, avec une concentration marquée en Europe de l’Ouest. Cela reflète non seulement les moyens financiers de ces pays, mais aussi leur attractivité dans le marché mondial des joueurs.
 
 ---
 
-### **Question 18 : **
+### **Question 18 : Quels clubs ont le plus contribué à la performance offensive de leur pays ? **
 
 #### 🎯 Objectif:
-
+Analyser comment les clubs participent au total de **buts marqués** dans chaque pays
 
 #### 🧪 Hypothèse :
+Les gros clubs (comme Manchester City ou PSG) représentent une part importante des buts de leur pays
 
-
-
-```{r}
-
-```
-
+![](data/image/Capture allemagne.PNG){width=100%}
+![](data/image/Capture eng.PNG){width=100%}
+![](data/image/Capture esp.PNG){width=100%}
+![](data/image/Capture france.PNG){width=100%}
+![](data/image/Capture italie.PNG){width=100%}
 
 #### 🧠 Interprétation du graphique:
 
+- 🔵 Dans chaque pays analysé, on observe que quelques clubs majeurs concentrent la majorité des buts marqués, ce qui confirme l’hypothèse.
+
+- 🔵 En Angleterre, Manchester City (99 buts) et Liverpool (94) dominent très largement, représentant à eux seuls près de 20 % des buts nationaux.
+
+- 🔵 En France, le PSG (90) devance les autres clubs, mais Rennes et Lyon affichent également une contribution offensive significative.
+
+- 🔵 En Espagne, les buts sont plus répartis entre plusieurs clubs : Real Madrid (80), Barcelone (68), et l’Atlético (65), sans qu’un seul club n’écrase totalement les autres.
+
+- 🔵 En Allemagne, le Bayern Munich (97) est nettement au-dessus, suivi de Dortmund (85) et Leverkusen (80), ce qui reflète une hiérarchie bien marquée.
+
+- 🔵 En Italie, l’écart est un peu moins prononcé, mais l’Inter (84), la Lazio (77) et Naples (74) forment un trio très productif.
 
 ✅ **Conclusion** :  
+La performance offensive des pays repose largement sur quelques clubs dominants, ce qui renforce leur rôle central dans leurs championnats respectifs. Cette concentration des buts traduit une inégalité sportive fréquente dans les grandes ligues européennes.
 
 ---
 
-### **Question 19 : **
+## **Conclusion Générale**
+Ce projet nous a permis d’explorer en profondeur les dynamiques du marché des transferts dans le football européen, en croisant des données de performance individuelles, collectives et économiques. Nous avons mis en évidence plusieurs faits marquants : les clubs recrutent différemment selon leur statut (ambitieux vs en lutte pour le maintien), la valeur marchande varie fortement selon le poste, et un recrutement ciblé est généralement plus efficace qu’un mercato massif.
 
-#### 🎯 Objectif:
+Nos analyses confirment que les investissements ne garantissent pas une amélioration des performances sportives, et qu’un bon recrutement repose autant sur la cohérence tactique que sur les moyens financiers. L’approche multi-angle (corrélations, rendements, contributions offensives, dépendances, etc.) a enrichi notre compréhension du lien entre stratégie de recrutement et performance.
 
+### 🧱 Difficultés rencontrées :
+- L’hétérogénéité des formats dans les fichiers de données (problèmes d’encodage,valeurs textuelles à nettoyer) a été un frein important au début.
+- Certaines données manquaient de précision ou étaient difficiles à relier directement (par exemple, le lien exact entre certains joueurs transférés et leurs statistiques après transfert).
 
-#### 🧪 Hypothèse :
-
-
-
-```{r}
-
-```
-
-
-#### 🧠 Interprétation du graphique:
+### 🔍 Pistes d’approfondissement :
+- Suivre les **performances des recrues tout au long de la saison** pour distinguer l’impact immédiat vs différé.
+- Analyser aussi le **coût par point gagné** ou par but marqué pour chaque club, afin de relier investissement et efficacité.
 
 
-✅ **Conclusion** :  
+### 🗣️ Retour individuel :
+
+- **Ahamad MOHAMMAD** : Ce projet m’a permis de mettre en œuvre les concepts d’ergonomie graphique, de narration visuelle et de contraste abordés pendant le cours. J’ai apprécié expérimenter avec `fmsb` et `shiny` pour créer des visualisations interactives, tout en tenant compte de la lisibilité et de l’impact visuel. La comparaison entre R et des outils comme Tableau m’a aidé à mieux comprendre les cas d’usage de chaque outil. Je suis globalement très satisfait de ce cours. 
+
+- **Minko Bikono NEIL-JOVY** : J’ai renforcé ma maîtrise de `dplyr` et `tidyverse`, tout en prenant conscience de l’importance de la clarté visuelle dans la restitution des résultats. Les apports du cours sur la psychologie des couleurs et les chart types adaptés m’ont aidé à structurer des visualisations efficaces. Les échanges autour de Power BI ont également enrichi ma culture des outils BI. Ce projet a été formateur, et je repars avec des bases solides en data visualisation.
+
+- **Simon GELBART** : Ce projet m’a permis d’approfondir mes compétences en visualisation de données, notamment avec `ggplot2`, tout en mettant en pratique les notions vues en cours comme l’usage cohérent des couleurs et les principes d’ergonomie. J’ai particulièrement apprécié la réflexion autour de la lisibilité des graphiques. Le cours m’a aussi permis de découvrir des outils comme Tableau, et de comparer leur potentiel avec R. Je suis très satisfait de l’approche pédagogique et des applications concrètes proposées.
+
+- **Willen AMICHE** : J’ai découvert la force des visualisations narratives dans un projet analytique structuré, en lien direct avec les principes abordés en cours (cohérence visuelle, perception). J’ai pris en compte les conseils sur l’organisation de l’information et les bons usages de la couleur pour renforcer l’impact de mes graphiques. Les travaux sur Power BI m’ont permis de situer R dans un écosystème plus large. Ce projet a solidifié ma compréhension de la data visualisation, et je ressors très satisfait du contenu et de la pédagogie du cours.
+
 
 ---
 
-### **Question 20 : **
+## **Annexe – Répartition du travail**
 
-#### 🎯 Objectif:
+### 🔄 Répartition des analyses :
 
+- **Ahamad MOHAMMAD** : responsable des analyses liées aux expected goals et à la performance offensive. Il a également conçu l’application Shiny, en lien avec les travaux exploratoires sur l’interactivité en data visualisation.
 
-#### 🧪 Hypothèse :
+- **Minko Bikono NEIL-JOVY** : chargé des analyses de structure de marché, de profils de recrues et de distribution des postes. Il a structuré l’ensemble du rapport RMarkdown et piloté l’exploration comparative avec Power BI.
 
+- **Simon GELBART** : a réalisé les visualisations sur la dépendance aux buteurs, la formation des jeunes, et les comparaisons inter-ligues. Il a aussi contribué à l’analyse de la cohérence stratégique des recrutements.
 
+- **Willen AMICHE** : a pris en charge les questions sur l’impact du volume de recrutement et la rentabilité sportive, ainsi que la rédaction de plusieurs interprétations graphiques et de la conclusion générale.
 
-```{r}
+### ✍️ Travaux collectifs :
 
-```
-
-
-#### 🧠 Interprétation du graphique:
-
-
-✅ **Conclusion** :  
-
-
+- La définition des hypothèses, la rédaction des interprétations et conclusions, ainsi que la relecture globale ont été menées de manière collaborative.
+- Tous les membres ont contribué au dépôt GitHub, au choix des visualisations, à la sélection des indicateurs pertinents et à la validation finale du rendu.
 
