@@ -1138,7 +1138,7 @@ On remarque que les 5 grands championnats sont en haut du classement comme prév
 ### **Question 16 : Valeur marchande des transferts selon pays et ligue de départ**
 
 #### 🎯 Objectif:
-Analyser la répartition de la valeur totale des transferts selon le pays et la ligue d’origine des joueurs. Cela permet de mieux comprendre où les clubs arrivent à faire de bons retour sur investissement et d’identifier les marchés les plus chers.
+Étudier la répartition de la valeur totale des transferts par pays et ligue d’origine, afin d’identifier où les clubs réalisent les investissements les plus élevés et d’identifier les marchés les plus chers.
 
 #### 🧪 Hypothèse :
 Les pays et ligues les plus riches ou les plus attractifs devraient générer des transferts avec des valeurs plus élevées. On s’attend donc à une concentration forte sur quelques ligues majeures (le top 5 ligues européennes).
@@ -1158,7 +1158,9 @@ Les pays et ligues les plus riches ou les plus attractifs devraient générer de
 
 
 ✅ **Conclusion** :  
-Les investissements sont concentrés dans un petit nombre de ligues majeures, confirmant l’hypothèse. Cette analyse financière complète l’analyse quantitative du volume des transferts. Cela confirme que les grands championnats ont un pouvoir de négociation bien plus fort. On voit aussi que la valeur d’un joueur ne dépend pas uniquement de son talent, mais aussi de son championnat d’origine et de sa visibilité médiatique.
+Les analyses quantitatives (volume de transferts) et financières (valeur des transferts) se complètent pour montrer que les grands championnats européens dominent largement le marché des transferts estivaux. Ces ligues ont non seulement le plus grand nombre de joueurs transférés, mais aussi les montants financiers les plus élevés. Cela reflète leur capacité à attirer, former et valoriser les talents, ainsi que leur poids économique et médiatique. Par ailleurs, la valeur marchande d’un joueur dépend non seulement de son talent individuel, mais aussi de son championnat d’origine, sa visibilité et la dynamique du marché.
+
+
 
 
 ---
