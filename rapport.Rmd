@@ -115,6 +115,8 @@ library(shiny)
 library(shinydashboard)
 library(DT)
 library(fontawesome)
+library(ggimage)
+library(rsvg)
 ```
 
 
@@ -666,6 +668,26 @@ Certains clubs, notamment ceux ayant une stratégie axée sur la formation ou la
 # Filtrer les jeunes joueurs 
 jeunes_joueurs <- player_stats_2021_2022  %>%
   filter(Age < 22)
+#On regorupe les logos
+logos <- data.frame(
+  Squad = c("Saint-Étienne", "Barcelona", "Stuttgart", "Rennes", "Reims",
+            "Monaco", "Bologna", "Valencia", "Paris S-G", "Leeds United", "Dortmund", "Bordeaux"),
+  logo = c(
+    "https://upload.wikimedia.org/wikipedia/fr/thumb/3/3e/AS_Saint-Etienne-logo_2022.svg/langfr-800px-AS_Saint-Etienne-logo_2022.svg.png",
+    "https://upload.wikimedia.org/wikipedia/fr/thumb/1/1d/Logo_FC_Barcelone.svg/langfr-800px-Logo_FC_Barcelone.svg.png",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/VfB_Stuttgart_1893_Logo.svg/langfr-800px-VfB_Stuttgart_1893_Logo.svg.png",
+    "https://upload.wikimedia.org/wikipedia/fr/thumb/e/e9/Logo_Stade_Rennais_FC.svg/langfr-800px-Logo_Stade_Rennais_FC.svg.png",
+    "https://upload.wikimedia.org/wikipedia/fr/thumb/a/ad/Logo_Stade_de_Reims_2020_%28Alternatif%29.svg/langfr-800px-Logo_Stade_de_Reims_2020_%28Alternatif%29.svg.png",
+    "https://upload.wikimedia.org/wikipedia/fr/thumb/1/1d/Logo_AS_Monaco_FC_2021.svg/langfr-800px-Logo_AS_Monaco_FC_2021.svg.png",
+    "https://upload.wikimedia.org/wikipedia/fr/thumb/f/fb/Logo_Bologna_FC_-_2018.svg/langfr-800px-Logo_Bologna_FC_-_2018.svg.png",
+    "https://upload.wikimedia.org/wikipedia/fr/thumb/1/19/Logo_Valencia_CF_2019.svg/langfr-800px-Logo_Valencia_CF_2019.svg.png",
+    "https://upload.wikimedia.org/wikipedia/fr/thumb/f/ff/Logo_Paris_Saint-Germain_2024.svg/langfr-330px-Logo_Paris_Saint-Germain_2024.svg.png",
+    "https://upload.wikimedia.org/wikipedia/fr/thumb/7/78/Logo_Leeds_United_FC.svg/langfr-800px-Logo_Leeds_United_FC.svg.png",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Borussia_Dortmund_logo.svg/langfr-800px-Borussia_Dortmund_logo.svg.png",
+    "https://upload.wikimedia.org/wikipedia/fr/thumb/8/8f/Logo_FC_Girondins_Bordeaux_-_2021.svg/langfr-800px-Logo_FC_Girondins_Bordeaux_-_2021.svg.png"
+  )
+)
+
 
 # Compter le nombre de jeunes joueurs par club
 jeunes_par_club <- jeunes_joueurs %>%
@@ -673,28 +695,39 @@ jeunes_par_club <- jeunes_joueurs %>%
   arrange(desc(nb_jeunes)) %>%
   top_n(10, nb_jeunes)
 
-# Barplot horizontal
-ggplot(jeunes_par_club, aes(x = reorder(Squad, nb_jeunes), y = nb_jeunes)) +
-  geom_col(fill = "#66BB6A", width = 0.6) +  
-  geom_text(aes(label = nb_jeunes), hjust = -0.1, size = 4, color = "black") +
-  coord_flip(clip = "off") +
+#Pr joindre les images aux données
+jeunes_par_club <- jeunes_par_club %>%
+  left_join(logos, by = c("Squad" = "Squad"))
+
+ggplot(jeunes_par_club, aes(x = nb_jeunes, y = reorder(Squad, nb_jeunes))) +
+  geom_col(fill = "#66BB6A", width = 0.6) +
+  
+  # Logo à gauche du nom de l'équipe avec taille réduite
+  geom_image(aes(image = logo), size = 0.04, x = -0.8, by = "width", asp = 1.5) +
+  
+  geom_text(aes(label = nb_jeunes), hjust = -0.3, size = 4) +
+  
   labs(
     title = "Top 10 des clubs avec le plus de jeunes joueurs (< 22 ans)\nSaison 2021/22",
-    x = NULL,
-    y = "Nombre de jeunes joueurs"
+    x = "Nombre de jeunes joueurs",
+    y = NULL
   ) +
   theme_minimal(base_size = 13) +
   theme(
     plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
-    axis.text.y = element_text(face = "bold"),
+    axis.text.y = element_text(face = "bold", margin = margin(r = 20)),
     axis.text.x = element_text(color = "gray30"),
-    panel.grid.major.y = element_blank(),  
-    panel.grid.minor = element_blank(),
-    plot.margin = margin(10, 20, 10, 10) 
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank()
   ) +
-  ylim(0, max(jeunes_par_club$nb_jeunes) + 2)  
+  xlim(-1.5, max(jeunes_par_club$nb_jeunes) + 3)
 
+ 
 ```
+
+
+
+
 
 ```{r}
 # Filtrer les jeunes joueurs (<23 ans)
