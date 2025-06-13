@@ -202,7 +202,7 @@ recrutements_top <- recrutements_par_poste %>%
 # Visualisation 
 ggplot(recrutements_top, aes(x = position, y = fct_reorder(club_to, nb_recrues), fill = nb_recrues)) +
   geom_tile(color = "white") +
-  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  scale_fill_gradient(low = "#A5D6A7", high = "#2E7D32") +
   labs(
     title = "Top 20 clubs – nombre de recrues par poste (été 2022)",
     x = "Poste",
@@ -242,7 +242,7 @@ Visualiser la valeur marchande des joueurs par poste pour comprendre quels types
 Nous pensons que les **attaquants** seront les plus valorisés sur le marché, en raison de leur impact direct sur les résultats et leur potentiel marketing. Les **défenseurs centraux** et **milieux offensifs** devraient aussi avoir une valeur élevée. À l'inverse, les **gardiens** devraient être en bas de l’échelle.
 
 
-```{r message=FALSE}
+```{r}
 
 # Nettoyage et préparation des données de transfert
 transfers_clean <- transfers_2022 %>%
@@ -266,10 +266,10 @@ transfers_clean_stats <- transfers_clean %>%
 # Visualisation avec titres en français
 ggplot(transfers_clean_stats, aes(x = reorder(position, mean_value), y = mean_value)) +
   geom_bar(stat = "identity", fill = "#4CAF50") +  
-  geom_errorbar(aes(ymin = pmax(mean_value - sd_value, 0), ymax = mean_value + sd_value), width = 0.2) +
+  geom_errorbar(aes(ymin = pmax(mean_value - sd_value, 1), ymax = mean_value + sd_value), width = 0.2) +
   labs(
     title = "Valeur marchande moyenne par poste (mercato été 2022)",
-    x = "Poste (en anglais)",
+    x = "Poste",
     y = "Valeur marchande moyenne (en millions d'euros)"
   ) +
   theme_minimal(base_size = 12) +
@@ -285,9 +285,9 @@ Ce graphique combine deux informations importantes :
 
 - les barres vertes indiquent la valeur marchande moyenne des joueurs par poste ;
 
-- les barres noires (barres d’erreur) représentent l’écart-type, c’est-à-dire la variabilité des valeurs selon les profils.
+- les barres noires (barres d’erreur) représentent l’écart-type, c’est-à-dire la variabilité des valeurs selon les profils. La valeur marchande limite du data set est de 1 million ce qui explique la valeur minimim de la plupart des barres d'erreurs.  
 
-- 🔵 Les attaquants sont effectivement les plus valorisés, avec une moyenne nettement supérieure. Cela confirme leur rôle stratégique et commercial. Leur forte variabilité montre que certains sont recrutés à prix très élevé, tirant la moyenne vers le haut.
+- 🔵 Les attaquants sont effectivement les plus valorisés, avec une moyenne nettement supérieure. Cela confirme leur rôle stratégique et commercial. Leur forte variabilité montre que certains sont valorisés à prix très élevé, tirant la moyenne vers le haut comme Erling Haaland.
 
 - 🔵 Les défenseurs centraux arrivent en seconde position, avec une valeur moyenne élevée et une dispersion plus contenue, signe d’une reconnaissance stable de leur importance.
 
@@ -318,14 +318,17 @@ team_stats_22_23 <- team_stats_2022_2023 %>%
   filter(!is.na(xG), !is.na(Pts))
 
 ggplot(team_stats_22_23, aes(x = xG, y = Pts)) +
-  geom_point(color = "#1f77b4", size = 3) +
+  geom_point(color = "#4CAF50", size = 3) +
   geom_smooth(method = "lm", color = "red", linetype = "dashed", se = TRUE) +  # se = TRUE pour afficher l'intervalle
   labs(
-    title = "Corrélation entre Expected Goals (xG) et Points en championnat(2022-23)",
+    title = "Corrélation entre Expected Goals (xG) et Points en championnat",
+    subtitle="sur l'année 2022/23",
     x = "Expected Goals (xG)",
     y = "Points"
   ) +
-  theme_minimal(base_size = 12)
+  theme_minimal(base_size = 12)+
+  theme(plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+  plot.subtitle = element_text(hjust = 0.5),)
 
 
 ```
@@ -455,14 +458,17 @@ transferts_top <- transfers_2022_q5 %>%
 
 # Graphique
 ggplot(transferts_top, aes(x = reorder(name, fee_num), y = fee_num)) +
-  geom_col(fill = "#1f77b4") +
+  geom_col(fill = "#4CAF50") +
   coord_flip() +
   labs(
-    title = "Top 15 des transferts les plus chers – Été 2022",
+    title = "Top 15 des transferts les plus chers",
+    subtitle = "Mercato d'été 2022",
     x = "Joueur",
     y = "Montant du transfert (en millions €)"
   ) +
-  theme_minimal(base_size = 12)
+  theme_minimal(base_size = 12)+
+  theme(plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+  plot.subtitle = element_text(hjust = 0.5),)
 
 ```
 
@@ -523,17 +529,23 @@ part_buts <- buts_totaux %>%
   arrange(desc(part_recrues)) %>%
   slice_max(part_recrues, n = 10)
 
-# Visualisation en barres horizontales
-ggplot(part_buts, aes(x = reorder(club, part_recrues), y = part_recrues)) +
-  geom_col(fill = "#0072B2") +
-  coord_flip() +
+# Visualisation en barres verticales
+ggplot(part_buts, aes(x = reorder(club, -part_recrues), y = part_recrues)) +
+  geom_col(fill = "#4CAF50") +
   scale_y_continuous(labels = percent_format(accuracy = 1)) +
   labs(
-    title = "Part des buts marqués par des recrues (Top 10 clubs)",
+    title = "Part des buts marqués par des recrues",
+    subtitle = "Saison 2022-2023",
     x = "Club",
     y = "Part des buts (%)"
   ) +
-  theme_minimal(base_size = 12)
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
 ```
 
 
@@ -581,14 +593,18 @@ rendement_joueurs <- player_stats_2021_2022 %>%
 ggplot(rendement_joueurs, aes(x = statut, y = rendement, fill = statut)) +
   geom_violin(trim = FALSE, alpha = 0.7) +
   geom_boxplot(width = 0.1, color = "black", outlier.shape = NA) +
+  scale_fill_manual(values = c("Recrue" = "#4CAF50", "Déjà présent" = "#FBC02D")) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
   labs(
-    title = "Rendement offensif : Recrues vs Joueurs déjà présents",
+    title = "Rendement offensif",
+    subtitle = "Recrues vs Joueurs déjà présents (saison 2022)",
     x = "",
     y = "Buts par minute jouée"
   ) +
   theme_minimal(base_size = 13) +
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
 ```
 
 
@@ -631,14 +647,18 @@ transfers_local_vs_intl <- transfers_2022 %>%
 # Barplot groupé 
 ggplot(transfers_local_vs_intl, aes(x = reorder(country_to, -nb_transferts), y = nb_transferts, fill = type)) +
   geom_bar(stat = "identity") +
+   scale_fill_manual(values = c("National" = "#4CAF50", "International" = "#FBC02D")) +
   labs(
-    title = "Recrutements nationaux vs internationaux (Top 15 pays – été 2022)",
+    title = "Recrutements nationaux vs internationaux ",
+    subtitle = "Top 15 pays – été 2022",
     x = "Pays de destination",
     y = "Nombre de transferts",
     fill = "Type de transfert"
   ) +
   theme_minimal(base_size = 13) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
 ```
 
 
@@ -703,18 +723,20 @@ ggplot(jeunes_par_club, aes(x = nb_jeunes, y = reorder(Squad, nb_jeunes))) +
   geom_col(fill = "#66BB6A", width = 0.6) +
   
   # Logo à gauche du nom de l'équipe avec taille réduite
-  geom_image(aes(image = logo), size = 0.04, x = -0.8, by = "width", asp = 1.5) +
+  geom_image(aes(image = logo), size = 0.035, x = -0.8, by = "width", asp = 1.5) +
   
   geom_text(aes(label = nb_jeunes), hjust = -0.3, size = 4) +
   
   labs(
-    title = "Top 10 des clubs avec le plus de jeunes joueurs (< 22 ans)\nSaison 2021/22",
-    x = "Nombre de jeunes joueurs",
-    y = NULL
-  ) +
+  title = "Top 10 des clubs avec le plus de jeunes joueurs",
+  subtitle = "joueurs de moins de 22 ans sur la Saison 2021/22",
+  x = "Nombre de jeunes joueurs",
+  y = NULL
+) +
   theme_minimal(base_size = 13) +
   theme(
     plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5), 
     axis.text.y = element_text(face = "bold", margin = margin(r = 20)),
     axis.text.x = element_text(color = "gray30"),
     panel.grid.major.y = element_blank(),
@@ -747,13 +769,15 @@ ggplot(minutes_par_club, aes(x = reorder(Squad, total_minutes), y = total_minute
   geom_point(color = "#FBC02D", size = 6) +
   coord_flip() +
   labs(
-    title = "Total des minutes jouées par les jeunes joueurs\npar club sur la saison 2021/22",
+    title = "Total des minutes jouées des jeunes joueurs\npar club",
+    subtitle = "joueurs de moins de 23 ans sur la Saison 2021/22",
     x = "Club",
     y = "Minutes jouées"
   ) +
   theme_minimal(base_size = 13) +
   theme(
     plot.title = element_text(face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5),
     axis.text.y = element_text(face = "bold"),
     panel.grid.major.y = element_blank(),
     panel.grid.minor = element_blank(),
@@ -903,7 +927,7 @@ defenseurs <- player_stats_2021_2022 %>%
     Blocs90 = Blocks / X90s,
     Degagements90 = Clr / X90s
   ) %>%
-  select(Player, Tacles90, Interceptions90, DuelsAerienPct, Blocs90, Degagements90) %>%
+  select(Player, Interceptions90,Tacles90, DuelsAerienPct, Degagements90, Blocs90) %>%
   column_to_rownames("Player")
 
 # Ajouter lignes max / min pour fmsb
@@ -915,37 +939,52 @@ radar_def <- rbind(
 
 # Renommer les colonnes pour plus de clarté
 colnames(radar_def) <- c(
-  "Tacles/90m",
-  "Interceptions/90m",
-  "Duels aériens (%)",
-  "Blocs/90m",
-  "Dégagements/90m"
+  "Interception",
+  "Tacles",
+  "Duels aériens",
+  "Dégagements",
+  "Blocs"
 )
 
-# Réduction des marges et affichage radar
-par(mar = c(2, 2, 2, 2))
 
-# Couleurs améliorées (Alaba passe en violet foncé)
+
+# Couleurs personnalisées (rouge, bleu, vert, violet foncé)
+couleurs_lignes <- c("#E41A1C", "#377EB8", "#4CAF50", "#984EA3")
+couleurs_remplissage <- paste0(couleurs_lignes, "50")  
+
+par(mar = c(4, 4, 6, 4))  
+
+# Dessin du radar
 radarchart(
   radar_def,
   axistype = 1,
-  pcol = c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3"),  # rouge, bleu, vert, violet
-  pfcol = c("#E41A1C50", "#377EB850", "#4DAF4A50", "#984EA350"),
+  pcol = couleurs_lignes,
+  pfcol = couleurs_remplissage,
   plwd = 2,
-  cglcol = "grey",
+  cglcol = "grey70",
   cglty = 1,
-  axislabcol = "grey",
-  vlcex = 0.9,
-  title = "Profil défensif des meilleurs défenseurs par championnat (2021-2022)"
+  axislabcol = "grey40",
+  vlcex = 0.7,
+  title = ""
 )
 
+
+mtext("Profil défensif des meilleurs défenseurs par championnat",
+      side = 3, line = 4, cex = 1.3, font = 2, col = "black", adj = 0.5)
+
+
+mtext("par championnat sur la saison 21/22 sur 90 minutes",
+      side = 3, line = 2, cex = 1, font = 3, col = "grey30", adj = 0.5)
+ 
+# Légende
 legend(
   "topright",
   legend = rownames(defenseurs),
-  col = c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3"),
+  col = couleurs_lignes,
   lty = 1,
   lwd = 2,
-  bty = "n"
+  bty = "n",
+  cex = 0.9
 )
 
 ```
@@ -999,15 +1038,19 @@ top_dependance <- team_stats_2021_2022 %>%
 
 # Visualisation
 ggplot(top_dependance, aes(x = reorder(Squad, dep_buteur), y = dep_buteur)) +
-  geom_col(fill = "#0072B2") +
+  geom_col(fill = "#4CAF50") +
   coord_flip() +
   labs(
-    title = "Top 10 des clubs les plus dépendants à leur meilleur buteur (2021-2022)",
+    title = "Les clubs les plus dépendants de leur meilleur buteur ",
+    subtitle = "saison 2021-2022",
     x = "Club",
     y = "Part des buts marqués par le meilleur buteur"
   ) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  theme_minimal()
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
 
 ```
 
@@ -1064,7 +1107,7 @@ df_invest <- left_join(variation_points, investissements, by = "club_to") %>%
 
 # Graphique : régression + intervalle de confiance
 ggplot(df_invest, aes(x = invest_total, y = variation_pts)) +
-  geom_point(size = 3, alpha = 0.7, color = "#E69F00") +
+  geom_point(size = 3, alpha = 0.7, color = "#4CAF50") +
   geom_smooth(
     method = "lm",
     se = TRUE,
@@ -1280,7 +1323,7 @@ Nos analyses confirment que les investissements ne garantissent pas une amélior
 
 - **Minko Bikono NEIL-JOVY** : J’ai renforcé ma maîtrise de `dplyr` et `tidyverse`, tout en prenant conscience de l’importance de la clarté visuelle dans la restitution des résultats. Les apports du cours sur la psychologie des couleurs et les chart types adaptés m’ont aidé à structurer des visualisations efficaces. Les échanges autour de Power BI ont également enrichi ma culture des outils BI. Ce projet a été formateur, et je repars avec des bases solides en data visualisation.
 
-- **Simon GELBART** : Ce projet m’a permis d’approfondir mes compétences en visualisation de données, notamment avec `ggplot2`, tout en mettant en pratique les notions vues en cours comme l’usage cohérent des couleurs et les principes d’ergonomie. J’ai particulièrement apprécié la réflexion autour de la lisibilité des graphiques. Le cours m’a aussi permis de découvrir des outils comme Tableau, et de comparer leur potentiel avec R. Je suis très satisfait de l’approche pédagogique et des applications concrètes proposées.
+- **Simon GELBART** : Ce projet m’a vraiment permis de progresser en visualisation de données. J’ai pu maîtriser ggplot2 et mettre en pratique les notions vues en cours, comme le choix cohérent des couleurs ou l’importance d’un bon équilibre visuel. J’ai aussi exploré des packages comme ggimage pour rendre les graphiques plus parlants et accrocheurs. J’ai pris le temps de soigner les titres, les légendes et les axes pour que chaque graphique soit clair et facile à lire. Ce travail m’a fait réaliser à quel point le design graphique joue un rôle essentiel pour bien faire passer un message. J’ai trouvé l’approche du cours à la fois concrète et stimulante, et je repars avec des bases solides pour la suite.
 
 - **Willen AMICHE** : J’ai découvert la force des visualisations narratives dans un projet analytique structuré, en lien direct avec les principes abordés en cours (cohérence visuelle, perception). J’ai pris en compte les conseils sur l’organisation de l’information et les bons usages de la couleur pour renforcer l’impact de mes graphiques. Les travaux sur Power BI m’ont permis de situer R dans un écosystème plus large. Ce projet a solidifié ma compréhension de la data visualisation, et je ressors très satisfait du contenu et de la pédagogie du cours.
 
@@ -1295,7 +1338,7 @@ Nos analyses confirment que les investissements ne garantissent pas une amélior
 
 - **Minko Bikono NEIL-JOVY** : chargé des analyses de structure de marché, de profils de recrues et de distribution des postes. Il a structuré l’ensemble du rapport RMarkdown et piloté l’exploration comparative avec Power BI.
 
-- **Simon GELBART** : a réalisé les visualisations sur la dépendance aux buteurs, la formation des jeunes, et les comparaisons inter-ligues. Il a aussi contribué à l’analyse de la cohérence stratégique des recrutements.
+- **Simon GELBART** : a réalisé les visualisations sur la dépendance aux buteurs, la formation des jeunes, et les comparaisons inter-ligues. Il a aussi contribué à l’analyse de la cohérence stratégique des recrutements et à corrigé/supervisé certains graphiques notamment dans la mise en page.
 
 - **Willen AMICHE** : a pris en charge les questions sur l’impact du volume de recrutement et la rentabilité sportive, ainsi que la rédaction de plusieurs interprétations graphiques et de la conclusion générale.
 
