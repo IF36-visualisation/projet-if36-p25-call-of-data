@@ -342,7 +342,7 @@ ggplot(team_stats_22_23, aes(x = xG, y = Pts)) +
 
 - 🔵 Certaines équipes dévient de la tendance (sous-performance ou efficacité maximale), ce qui montre que les xG ne suffisent pas à eux seuls à expliquer les résultats.
 
-✅ **Conclusion** : L’hypothèse est **confirmée**. Il existe une forte corrélation entre production offensive (xG) et performance en championnat.
+✅ **Conclusion** : L’hypothèse est **confirmée**. Il existe une forte corrélation entre production offensive (xG) et performance en championnat. Pour aller plus loin, tout porte à croire que dans le football moderne l'animation offensive est un facteur clé de succès des équipes.
 
 ---
 
@@ -891,7 +891,7 @@ ggplot(top_malchanceuses, aes(x = reorder(Squad, delta_goals), y = delta_goals))
 
 - 🔵 Des clubs comme **Hellas Vérone (9ᵉ en Serie A cette saison-là, 17ᵉ la suivante)** ou **Nantes (9ᵉ en Ligue 1, contre 18ᵉ puis 17ᵉ les saisons encadrantes)** témoignent également de performances supérieures à leur niveau habituel, suggérant une **saison de surperformance**.
 
-- 🔵 À l’inverse, les équipes "malchanceuses" (xG élevés mais peu de buts marqués) sont souvent bien classées : **Real Sociedad (6ᵉ)**, **Genoa (11ᵉ)**, **Lorient (10ᵉ)**, **Athletic Club (8ᵉ)**, **Clermont (8ᵉ)**, **Rayo Vallecano (12ᵉ)**, **Wolfsburg (12ᵉ)**. Leur bon classement s'explique par une capacité à se créer de nombreuses occasions, sans les concrétiser pleinement.
+- 🔵 À l’inverse, les équipes "malchanceuses" (xG élevés mais peu de buts marqués) sont souvent bien classées : **Real Sociedad (6ᵉ)**, **Genoa (11ᵉ)**, **Lorient (10ᵉ)**, **Athletic Club (8ᵉ)**, **Clermont (8ᵉ)**, **Rayo Vallecano (12ᵉ)**, **Wolfsburg (12ᵉ)**. Leur bon classement s'explique par une capacité à se créer de nombreuses occasions, sans les concrétiser pleinement.Pour ces équipes là, il serait intéressant de se positionner vers un buteur efficace pour la saison suivante, afin de transformer ces occasions en buts.
 
 - 🔵 Enfin, des équipes comme **Norwich** ou **Alavés**, derniers de leurs championnats, montrent que la "malchance" ne suffit pas toujours à expliquer les résultats : certaines saisons sont simplement ratées dans leur ensemble.
 
@@ -1059,7 +1059,7 @@ ggplot(top_dependance, aes(x = reorder(Squad, dep_buteur), y = dep_buteur)) +
 
 - 🔵 Le graphique illustre la part des buts marqués par le meilleur buteur de chaque club, mettant en évidence leur dépendance offensive à un seul joueur.
 
-- 🔵 Getafe est l’équipe la plus dépendante, avec près de 48 % de ses buts inscrits par Enes Ünal, suivi de Norwich City, dont Teemu Pukki a marqué également 48 % des buts du club.
+- 🔵 Getafe est l’équipe la plus dépendante, avec près de 48 % de ses buts inscrits par Enes Ünal, suivi de Norwich City, dont Teemu Pukki a marqué également 48 % des buts du club. Norwich était une des équipes avec le plus de difficulté à transformer ses xGS en buts comme vu dans la question 10, ce qui souligne l'importance de Pukki dans leur attaque.
 
 - 🔵 Des clubs comme Alavés ou Espanyol affichent eux aussi une forte dépendance offensive, dépassant le seuil de 40 % de buts venant d’un seul joueur.
 
@@ -1119,6 +1119,7 @@ ggplot(milieux, aes(x = reorder(Player, note_creation), y = note_creation, fill 
 
 Cette approche met en lumière les milieux les plus impliqués dans la création offensive, qu’ils soient passeurs décisifs, régulateurs du jeu ou moteurs de la progression du ballon.
 Elle montre que la créativité ne se limite pas aux passes décisives visibles, mais aussi à la construction d’occasions, essentielle au jeu moderne.
+Ses profils pourrait être des atouts majeurs pour les clubs cherchant à renforcer leur milieu de terrain, en apportant une vision du jeu et une capacité à créer des occasions de but.
 
 ---
 
