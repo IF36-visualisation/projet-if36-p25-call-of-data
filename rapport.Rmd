@@ -342,7 +342,7 @@ ggplot(team_stats_22_23, aes(x = xG, y = Pts)) +
 
 - 🔵 Certaines équipes dévient de la tendance (sous-performance ou efficacité maximale), ce qui montre que les xG ne suffisent pas à eux seuls à expliquer les résultats.
 
-✅ **Conclusion** : L’hypothèse est **confirmée**. Il existe une forte corrélation entre production offensive (xG) et performance en championnat. Pour aller plus loin, tout porte à croire que dans le football moderne l'animation offensive est un facteur clé de succès des équipes.
+✅ **Conclusion** : L’hypothèse est **confirmée**. Il existe une forte corrélation entre production offensive (xG) et performance en championnat. Pour aller plus loin, tout porte à croire que dans le football moderne l'animation offensive est un facteur clé de succès des équipes. 
 
 ---
 
@@ -1119,7 +1119,7 @@ ggplot(milieux, aes(x = reorder(Player, note_creation), y = note_creation, fill 
 
 Cette approche met en lumière les milieux les plus impliqués dans la création offensive, qu’ils soient passeurs décisifs, régulateurs du jeu ou moteurs de la progression du ballon.
 Elle montre que la créativité ne se limite pas aux passes décisives visibles, mais aussi à la construction d’occasions, essentielle au jeu moderne.
-Ses profils pourrait être des atouts majeurs pour les clubs cherchant à renforcer leur milieu de terrain, en apportant une vision du jeu et une capacité à créer des occasions de but.
+Ses profils pourrait être des atouts majeurs pour les clubs cherchant à renforcer leur milieu de terrain, en apportant une vision du jeu et une capacité à créer des occasions de but. (cf question 3)
 
 ---
 
