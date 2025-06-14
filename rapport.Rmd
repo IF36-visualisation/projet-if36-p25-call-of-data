@@ -1277,3 +1277,13 @@ Nos analyses confirment que les investissements ne garantissent pas une amélior
 - La définition des hypothèses, la rédaction des interprétations et conclusions, ainsi que la relecture globale ont été menées de manière collaborative.
 - Tous les membres ont contribué au dépôt GitHub, au choix des visualisations, à la sélection des indicateurs pertinents et à la validation finale du rendu.
 
+
+
+---
+
+## **Bibliographie**
+
+- **Mr FALIP Joris**. *Cours IF36 – Visualisation de données*. Disponible sur : [https://if36.dataframe.fr](https://if36.dataframe.fr)  
+- **The Data Viz Catalogue**. *Une bibliothèque des différents types de visualisations de données*. Disponible sur : [https://datavizcatalogue.com](https://datavizcatalogue.com)  
+- **Udemy**. *Devenir un expert de Power BI – La formation complète*. Disponible sur : [https://www.udemy.com/course/devenir-un-expert-de-power-bi-la-formation-complete/](https://www.udemy.com/course/devenir-un-expert-de-power-bi-la-formation-complete/)  
+- **OpenAI ChatGPT**. *Assistance à la simplification et à l’optimisation de code R pour des visualisations plus rapides et efficaces*. [https://chat.openai.com](https://chat.openai.com)  
