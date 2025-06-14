@@ -800,7 +800,7 @@ ggplot(minutes_par_club, aes(x = reorder(Squad, total_minutes), y = total_minute
 
 - 🔵 Aucun lien direct n’émerge entre le **budget** et l’**utilisation des jeunes** : même les clubs les plus riches (**PSG**, **Milan AC**, **Barça**) misent fortement sur leur centre de formation. Cela montre que la formation est un levier stratégique très efficace, au-delà même des moyens financiers. 
 
-- 🔵 Il est intéressant de voir que beaucoup de clubs très haut classé (en 21/22) au classement de leur championnat n'hésite pas à miser sur les jeunes comme **Barcelone** (2ème de liga) ou encore **Dortmund** et **Leverkusen** respectivement 2ème et 3ème de Bundesliga.
+- 🔵 Il est intéressant de voir que beaucoup de clubs très haut classé (en 21/22) au classement de leur championnat n'hésite pas à miser sur les jeunes comme **Barcelone** (2ème de liga) ou encore **Dortmund** et **Leverkusen** respectivement 2ème et 3ème de Bundesliga. Mais également que certains clubs comme Saint-Etienne ou Bordeaux (respectivement 18ème et 20ème de Ligue 1) ont également une politique de formation très marquée, mais n'ont pas réussi à se maintenir dans l'élite. Finalement, il semble que miser sur des jeunes joueurs soit une stratégie gagnante à long terme, mais pas forcément à court terme pour les clubs qui ont des résultats sportifs très médiocres.
 
 
 
