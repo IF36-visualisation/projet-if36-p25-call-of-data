@@ -904,7 +904,7 @@ Les équipes "chanceuses", qui marquent plus que leurs expected goals (xG), sont
 
 ---
 
-### **Question 11 : Les clubs ayant recruté plus de joueurs ont-ils mieux performé ? **
+### **Question 11 : Quel est le profil défensif des meilleurs défenseurs européens ?? **
 
 #### 🎯 Objectif:
 Étudier s’il existe une relation entre le nombre de recrues lors du mercato estival 2022 et l’évolution des performances sportives des clubs entre 2021-2022 et 2022-2023.
